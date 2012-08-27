@@ -1,7 +1,9 @@
-function login(loginData) {
-  // TODO: implement.
+function login() {
+  $.post("/login", {}, function(response) {
+    console.log(response);
+  });
 }
 
-function logout(logoutData) {
+function logout() {
   // TODO: implement.
 }
