@@ -34,21 +34,21 @@ def message():
   
   # Check if this is an instruction.
   if body.startswith("#"):
-    handleInstruction(body[1:], user, resp)
+    handleInstruction(body[1:], user, phoneNumber, resp)
   # Otherwise, we need to route this message.
   else:
     handleMessage(body, user, resp)
   return str(resp)
 
 # Handle an instruction from the user. Includes getting matches, stopping conversations, and verifying accounts.
-def handleInstruction(instruction, user, resp):  
+def handleInstruction(instruction, user, phoneNumber, resp):  
   # If there's a user, handle the instruction.
   if user:
     userId = user["id"]
     # Case: the user wants a new conversation.
     if instruction == "new":
       # Unpause the user.
-      db.unpauseUser(userId)
+      #db.unpauseUser(userId)
       
       # If the user is currently in a conversation, end it.
       db.endCurrentConversationForUser(userId)
@@ -57,7 +57,7 @@ def handleInstruction(instruction, user, resp):
       matchedUser = db.getMatchForUser(userId)
       if matchedUser:
         conversation = db.insertConversation(userId, matchedUser["id"])
-        resp.sms("You have a new texting partner: %s" % (matchedUser["gender"]))
+        resp.sms("You have a new texting partner: %s %s" % (matchedUser["gender"], matchedUser["name"]))
       else:
         resp.sms("Looking for a match. You'll get a text when one is available!")
     # Case: the user wants to pause service.
@@ -67,7 +67,7 @@ def handleInstruction(instruction, user, resp):
       
   # If there's no user and the instruction is a digit, it's a verification code. So try to register the user.
   elif instruction.isdigit():
-    if registerUser(body[1:], phoneNumber):
+    if registerUser(instruction, phoneNumber):
       resp.sms("Welcome to convos, breh.")
     else:
       resp.sms("Verification code doesn't exist.")
