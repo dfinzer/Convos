@@ -7,6 +7,10 @@ PASSWORD = "convos"
 db = MySQLdb.connect(db=DATABASE, passwd=PASSWORD, cursorclass=MySQLdb.cursors.DictCursor)
 cursor = db.cursor()
 
+# Gets the value of a key for a dictionary if it exists, otherwise returns NULL.
+def getValueOrNull(dict, key):
+  return dict[key] if key in dict else "NULL"
+
 ## Users:
 # Inserts a new user with pending registration status and specified verification code into the table.
 def insertUserFromFacebookData(facebookData, verificationCode):  
@@ -15,15 +19,15 @@ def insertUserFromFacebookData(facebookData, verificationCode):
   cursor.execute("""INSERT INTO user (name, first_name, last_name, email, locale, username, gender, \
     fb_uid, fb_verified, registration_status, verification_code) \
     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""", \
-    (facebookData["name"], \
-    facebookData["first_name"], \
-    facebookData["last_name"], \
-    facebookData["email"], \
-    facebookData["locale"], \
-    facebookData["username"], \
-    facebookData["gender"], \
-    facebookData["id"], \
-    facebookData["verified"], \
+    (getValueOrNull(facebookData, "name"), \
+    getValueOrNull(facebookData, "first_name"), \
+    getValueOrNull(facebookData, "last_name"), \
+    getValueOrNull(facebookData, "email"), \
+    getValueOrNull(facebookData, "locale"), \
+    getValueOrNull(facebookData, "username"), \
+    getValueOrNull(facebookData, "gender"), \
+    getValueOrNull(facebookData, "id"), \
+    getValueOrNull(facebookData, "verified"), \
     "pending", \
     verificationCode))
   db.commit()
@@ -56,7 +60,9 @@ def registerUserWithPhoneNumber(userId, phoneNumber):
 def getMatchForUser(userId):
   # Get all users that haven't been matched with this user and aren't currently in 'in-progress' conversations.
   cursor.execute("""SELECT * FROM user WHERE id NOT IN (SELECT user_one_id FROM conversation WHERE user_two_id = %s OR in_progress = True) \
-    AND id NOT IN (SELECT user_two_id FROM conversation WHERE user_one_id = %s OR in_progress = True)""", (userId, userId))
+    AND id NOT IN (SELECT user_two_id FROM conversation WHERE user_one_id = %s OR in_progress = True) \
+    AND registration_status = 'registered'
+    AND id != %s""", (userId, userId, userId))
   return cursor.fetchone()
   
 # Inserts a new conversation with the two specified user id's.
@@ -66,12 +72,13 @@ def insertConversation(userOneId, userTwoId):
 
 # Gets the current in-progress conversation for the user.
 def getCurrentConversationForUser(userId):
-  cursor.execute("""SELECT * FROM conversation WHERE user_one_id = %s OR user_two_id = %s AND in_progress = True""", (userId, userId))
+  cursor.execute("""SELECT * FROM conversation WHERE (user_one_id = %s OR user_two_id = %s) AND in_progress = True""", (userId, userId))
   return cursor.fetchone()
 
 # Ends any in-progress conversations for the user.
 def endCurrentConversationForUser(userId):
-  cursor.execute("""UPDATE conversation SET in_progress = False WHERE user_one_id = %s OR user_two_id = %s AND in_progress = True""")
+  cursor.execute("""UPDATE conversation SET in_progress = False WHERE user_one_id = %s OR user_two_id = %s \
+    AND in_progress = True""", (userId, userId))
   
 ## Messages:
 def insertMessageForConversation(conversationId, fromUserId, body):
