@@ -17,9 +17,6 @@ client = TwilioRestClient(account_sid, auth_token)
 facebook_app_id = '326547147430900'
 facebook_secret = 'd0347b67f972d8c3c751c7a29ee55b5d'
 
-#message = client.sms.messages.create(to="+19253896343", from_="+19252720008", \
-#  body="Hello there!")
-
 @app.route("/")
 def hello():
   return "Hello World!"
