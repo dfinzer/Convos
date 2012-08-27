@@ -29,46 +29,66 @@ def message():
   # Check if a user for this phone number exists in the database.
   user = db.getUserFromPhoneNumber(phoneNumber)
   
+  # Initialize an appropriate twilio response.
   resp = twilio.twiml.Response()
+  
   # Check if this is an instruction.
   if body.startswith("#"):
-    instruction = body[1:]
-    
-    # If there's a user, handle a user instruction.
-    if user:
-      userId = user["id"]
-      if instruction == "match":
-        matchedUser = db.getMatchForUser(userId)
-        if matchedUser:
-          conversation = db.insertConversation(userId, matchedUser["id"])
-          resp.sms("You have a new texting partner: %s" % (matchedUser["gender"]))
-        else:
-          resp.sms("Looking for a match. You'll get a text when one is available!")
-          
-    # If there's no user and the instruction is a digit, it's a verification code. So try to register the user.
-    elif instruction.isdigit():
-      if registerUser(body[1:], phoneNumber):
-        resp.sms("Welcome to convos, breh.")
-      else:
-        resp.sms("Verification code doesn't exist.")
-  # Otherwise, we need to route this message to whoever the user is currently conversing with.
+    handleInstruction(body[1:], user, resp)
+  # Otherwise, we need to route this message.
   else:
-    if user:
-      conversation = db.getCurrentConversationForUser(user["id"])
-      if conversation:
-        # Get the matched user.
-        matchedUserId = conversation["user_two_id"] if conversation["user_one_id"] == user["id"]  \
-          else conversation["user_two_id"]
-        matchedUser = db.getUserFromId(matchedUserId)
-        matchedPhoneNumber = matchedUser["phone_number"]
-        
-        # Send the message via text.
-        message = client.sms.messages.create(to=matchedPhoneNumber, from_=twilio_phone_number, \
-          body="Partner: " + body)
-        
-        # Log the message in our own database.
-        db.insertMessageForConversation(conversation["id"], user["id"], body)
+    handleMessage(body, user, resp)
   return str(resp)
+
+# Handle an instruction from the user. Includes getting matches, stopping conversations, and verifying accounts.
+def handleInstruction(instruction, user, resp):  
+  # If there's a user, handle the instruction.
+  if user:
+    userId = user["id"]
+    # Case: the user wants a new conversation.
+    if instruction == "new":
+      # Unpause the user.
+      db.unpauseUser(userId)
+      
+      # If the user is currently in a conversation, end it.
+      db.endCurrentConversationForUser(userId)
+      
+      # Get a new match for the user.
+      matchedUser = db.getMatchForUser(userId)
+      if matchedUser:
+        conversation = db.insertConversation(userId, matchedUser["id"])
+        resp.sms("You have a new texting partner: %s" % (matchedUser["gender"]))
+      else:
+        resp.sms("Looking for a match. You'll get a text when one is available!")
+    # Case: the user wants to pause service.
+    elif instruction == "pause":
+      db.pauseUser(userId)
+      resp.sms("Paused. When you're read to start again, text #new to get a new conversation.")
+      
+  # If there's no user and the instruction is a digit, it's a verification code. So try to register the user.
+  elif instruction.isdigit():
+    if registerUser(body[1:], phoneNumber):
+      resp.sms("Welcome to convos, breh.")
+    else:
+      resp.sms("Verification code doesn't exist.")
+
+# Handle an incoming message. Route the message to the appropriate user.
+def handleMessage(body, user, resp):
+  if user:
+    conversation = db.getCurrentConversationForUser(user["id"])
+    if conversation:
+      # Get the matched user.
+      matchedUserId = conversation["user_two_id"] if conversation["user_one_id"] == user["id"]  \
+        else conversation["user_two_id"]
+      matchedUser = db.getUserFromId(matchedUserId)
+      matchedPhoneNumber = matchedUser["phone_number"]
+      
+      # Send the message via text.
+      #message = client.sms.messages.create(to=matchedPhoneNumber, from_=twilio_phone_number, \
+      #  body="Partner: " + body)
+      
+      # Log the message in our own database.
+      db.insertMessageForConversation(conversation["id"], user["id"], body)
 
 # Attempts to register an existing user with the specified verification code.
 # Returns whether we were successful.
