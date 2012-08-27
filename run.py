@@ -1,6 +1,7 @@
 import db
 import facebook
 import json
+import random
 import twilio.twiml
 
 from flask import Flask
@@ -18,26 +19,32 @@ client = TwilioRestClient(account_sid, auth_token)
 facebook_app_id = '326547147430900'
 facebook_secret = 'd0347b67f972d8c3c751c7a29ee55b5d'
 
-@app.route("/")
-def hello():
-  return "Hello World!"
-
-@app.route("/message", methods=['GET', 'POST'])
+@app.route("/message", methods=['POST'])
 def message():
-  resp = twilio.twiml.Response()
-  message = "Hi there."
-  resp.sms(message)
+  body = request.values.get("Body")
+  phoneNumber = request.values.get("From")
   
+  resp = twilio.twiml.Response()
+  if body.startswith("#"):
+    if registerUser(body[1:]):
+      resp.sms("Welcome to convos, breh.")
+    else:
+      resp.sms("Verification code doesn't exist.")
+  else:
+    resp = twilio.twiml.Response()
+    resp.sms("No functionality yet. Sorry breh.")
   return str(resp)
 
-@app.route("/register", methods=['POST'])
-  # Get the verification code the user entered.
-  enteredVerificationCode = request.form["verification_code"]
-  
-  # Check it against the stored verification code.
-  user = facebook.get_user_from_cookie(request.cookies, facebook_app_id, facebook_secret)
-  
-  # TODO: check verification code.
+# Attempts to register an existing user with the specified verification code.
+# Returns whether we were successful.
+def registerUser(verificationCode, phoneNumber):
+  # Check that there exists an unregistered user with that verification code.
+  existingUser = db.getUserFromVerificationCode(enteredVerificationCode)
+  if existingUser:
+    db.registerUserWithPhoneNumber(existingUser["id"])
+    return True
+  else:
+    return False
 
 @app.route("/login", methods=['POST'])
 def login():
@@ -46,19 +53,22 @@ def login():
     graph = facebook.GraphAPI(user["access_token"])
     profile = graph.get_object("me")
     friends = graph.get_connections("me", "friends")
-    response = {"status": "ok"}
     
     # Check if this user already exists in the database.
     existingUser = db.getUserFromFacebookUid(user["uid"])
     if existingUser:
-      response = {"status": user["registration_status"]}
-    
-    # Create a new user, with registration status pending.
-    verificationCode = "12345"
-    db.insertUserFromFacebookData(profile, verificationCode)
-    response = {"status": "pending", "verification_code": verificationCode}
+      # If the user hasn't registered yet, send back the verification code.
+      if existingUser["registration_status"] == "pending":
+        response = {"status": "pending", "verification_code": existingUser["verification_code"]}
+      else:
+        response = {"status": "registered"}
+    else:
+      # Create a new user, with registration status pending.
+      verificationCode = str(random.randint(10000, 10000))
+      db.insertUserFromFacebookData(profile, verificationCode)
+      response = {"status": "pending", "verification_code": verificationCode}
   else:
-    response = {"status": "Not yet logged in with facebook."}
+    response = {"status": "error", "error": "Not yet logged in to Facebook."}
   return json.dumps(response)
   
 if __name__ == "__main__":

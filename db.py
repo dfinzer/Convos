@@ -6,14 +6,15 @@ PASSWORD = "convos"
 
 db = MySQLdb.connect(db=DATABASE, passwd=PASSWORD, cursorclass=MySQLdb.cursors.DictCursor)
 
-# Inserts a new user with pending registration status into the table.
-def insertUserFromFacebookData(facebookData):
+# Inserts a new user with pending registration status and specified verification code into the table.
+def insertUserFromFacebookData(facebookData, verificationCode):
   cursor = db.cursor()
   
   # TODO: check if the necessary user data is actually there.
   # Insert a new user if one with the specified fb_uid does not already exist.
-  cursor.execute("""INSERT INTO user (name, first_name, last_name, email, locale, username, gender, fb_uid, fb_verified, registration_status) \
-    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""", \
+  cursor.execute("""INSERT INTO user (name, first_name, last_name, email, locale, username, gender, \
+    fb_uid, fb_verified, registration_status, verification_code) \
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""", \
     (facebookData["name"], \
     facebookData["first_name"], \
     facebookData["last_name"], \
@@ -23,7 +24,8 @@ def insertUserFromFacebookData(facebookData):
     facebookData["gender"], \
     facebookData["id"], \
     facebookData["verified"], \
-    "pending"))
+    "pending", \
+    verificationCode))
   db.commit()
 
 # Gets a user with the specified id.
@@ -31,3 +33,15 @@ def getUserFromFacebookUid(facebookUid):
   cursor = db.cursor()
   cursor.execute("""SELECT * FROM user WHERE fb_uid = %s""", (facebookUid))
   return cursor.fetchone()
+  
+# Gets a user with the specified verification code.
+def getUserFromVerificationCode(verificationCode):
+  cursor = db.cursor()
+  cursor.execute("""SELECT * FROM user WHERE verification_code = %s AND registration_status = 'pending'""", (verificationCode))
+  return cursor.fetchone()
+  
+# Associates the specified user account with the phone number.
+def registerUserWithPhoneNumber(userId, phoneNumber):
+  cursor = db.cursor()
+  cursor.execute("""UPDATE user SET phone_number = %s, registration_status = 'registered' WHERE id = %s""", \
+    (phoneNumber, userId))

@@ -1,6 +1,7 @@
 function login() {
   $.post("/login", {}, function(response) {
-    console.log(response);
+    data = $.parseJSON(response);
+    console.log(data)
   });
 }
 

@@ -15,6 +15,7 @@ CREATE TABLE  `convos`.`user` (
   `fb_uid` VARCHAR( 100 ),
   `fb_verified` BOOLEAN,
   `registration_status` VARCHAR( 100 ) NOT NULL, -- Can be pending or registered.
+  `verification_code` VARCHAR ( 100 ),
   PRIMARY KEY (  `id` ),
   UNIQUE KEY (`fb_uid`)
 ) ENGINE = MYISAM;
