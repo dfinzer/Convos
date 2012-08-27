@@ -59,30 +59,30 @@ def handleInstruction(instruction, user, phoneNumber, resp):
     # Case: the user wants a new conversation.
     if instruction == "new":
       # If the user is currently in a conversation, end it.
-      db.getCurrentConversationForUser(user["id"])
+      conversation = db.getCurrentConversationForUser(user["id"])
       if conversation:
-        matchedUserId = getOtherUserId(conversation, user)
+        oldMatchedUserId = getOtherUserId(conversation, user)
         db.endConversation(conversation["id"])
         
         # Notify the other user that the conversation has ended.
-        oldMatchedUser = db.getUserFromId(matchedUserId)
-        oldMatchedPhoneNumber = matchedUser["phone_number"]
+        oldMatchedUser = db.getUserFromId(oldMatchedUserId)
+        oldMatchedPhoneNumber = oldMatchedUser["phone_number"]
       
         # Look for a new match for this user.
         newMatchForOldUser = db.getMatchForUser(userId)
         
         if newMatchForOldUser:
-          textingClient.sendMessage(matchedPhoneNumber, "Your current partner ended the conversation. We've matched you up with a new partner: %s %s" \
+          textingClient.sendMessage(oldMatchedPhoneNumber, "Your current partner ended the conversation. We've matched you up with a new partner: %s %s" \
             % (newMatchForOldUser["gender"], newMatchForOldUser["name"]))
         else:
-          textingClient.sendMessage(matchedPhoneNumber, \
+          textingClient.sendMessage(oldMatchedPhoneNumber, \
             "Your current partner ended the conversation. We're looking for a new match and will text you when one is available.")
 
       # Get a new match for the user.
-      matchedUser = db.getMatchForUser(userId)
-      if matchedUser:
-        conversation = db.insertConversation(userId, matchedUser["id"])
-        resp.sms("You have a new texting partner: %s %s" % (matchedUser["gender"], matchedUser["name"]))
+      newMatchedUser = db.getMatchForUser(userId)
+      if newMatchedUser:
+        conversation = db.insertConversation(userId, newMatchedUser["id"])
+        resp.sms("You have a new texting partner: %s %s" % (newMatchedUser["gender"], newMatchedUser["name"]))
       else:
         resp.sms("Looking for a match. You'll get a text when one is available!")
         
