@@ -26,7 +26,7 @@ def message():
   
   resp = twilio.twiml.Response()
   if body.startswith("#"):
-    if registerUser(body[1:]):
+    if registerUser(body[1:], phoneNumber):
       resp.sms("Welcome to convos, breh.")
     else:
       resp.sms("Verification code doesn't exist.")
@@ -39,9 +39,9 @@ def message():
 # Returns whether we were successful.
 def registerUser(verificationCode, phoneNumber):
   # Check that there exists an unregistered user with that verification code.
-  existingUser = db.getUserFromVerificationCode(enteredVerificationCode)
+  existingUser = db.getUserFromVerificationCode(verificationCode)
   if existingUser:
-    db.registerUserWithPhoneNumber(existingUser["id"])
+    db.registerUserWithPhoneNumber(existingUser["id"], phoneNumber)
     return True
   else:
     return False
@@ -64,7 +64,7 @@ def login():
         response = {"status": "registered"}
     else:
       # Create a new user, with registration status pending.
-      verificationCode = str(random.randint(10000, 10000))
+      verificationCode = str(random.randint(1000, 10000))
       db.insertUserFromFacebookData(profile, verificationCode)
       response = {"status": "pending", "verification_code": verificationCode}
   else:
