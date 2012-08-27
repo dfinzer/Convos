@@ -25,6 +25,7 @@ CREATE TABLE `convos`.`conversation` (
   `id` INT NOT NULL AUTO_INCREMENT ,
   `user_one_id` INT NOT NULL,
   `user_two_id` INT NOT NULL,
+  `in_progress` BOOLEAN,
   PRIMARY KEY (  `id` )
 )
 

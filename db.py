@@ -57,10 +57,23 @@ def registerUserWithPhoneNumber(userId, phoneNumber):
 # Conversations:
 def getMatchForUser(userId):
   cursor = db.cursor()
-  cursor.execute("""SELECT * FROM user WHERE id NOT IN (SELECT user_one_id FROM conversation WHERE user_two_id = %s) \
-    AND id NOT IN (SELECT user_two_id FROM conversation WHERE user_one_id = %s)""", (userId, userId))
+  # Get all users that haven't been matched with this user and aren't currently in 'in-progress' conversations.
+  cursor.execute("""SELECT * FROM user WHERE id NOT IN (SELECT user_one_id FROM conversation WHERE user_two_id = %s OR in_progress = True) \
+    AND id NOT IN (SELECT user_two_id FROM conversation WHERE user_one_id = %s OR in_progress = True)""", (userId, userId))
   return cursor.fetchone()
   
 # Inserts a new conversation with the two specified user id's.
 def insertConversation(userOneId, userTwoId):
   cursor = db.cursor()
+  cursor.execute("""INSERT INTO conversation (user_one_id, user_two_id, in_progress) VALUES (%s, %s, True)""", \
+    (userOneId, userTwoId))
+
+def getMatchedUserForUser(userId):
+  cursor = db.cursor()
+  # TODO: filter out the user himself.
+  cursor.execute("""SELECT * FROM user WHERE id IN (SELECT user_one_id FROM conversation WHERE user_two_id = %s AND in_progress = True) \
+    OR id IN (SELECT user_two_id FROM conversation WHERE user_one_id = %s AND in_progress = True)""", (userId, userId))
+  return cursor.fetchone()
+
+def endConversation(userId):
+  pass
