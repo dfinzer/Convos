@@ -20,12 +20,13 @@ client = TwilioRestClient(account_sid, auth_token)
 facebook_app_id = '326547147430900'
 facebook_secret = 'd0347b67f972d8c3c751c7a29ee55b5d'
 
+# Handles incoming text messages.
 @app.route("/message", methods=['POST'])
 def message():
   body = request.values.get("Body").strip()
   phoneNumber = request.values.get("From")
 
-  # Check if this user exists in the database.
+  # Check if a user for this phone number exists in the database.
   user = db.getUserFromPhoneNumber(phoneNumber)
   
   resp = twilio.twiml.Response()
@@ -43,18 +44,30 @@ def message():
           resp.sms("You have a new texting partner: %s" % (matchedUser["gender"]))
         else:
           resp.sms("Looking for a match. You'll get a text when one is available!")
+          
     # If there's no user and the instruction is a digit, it's a verification code. So try to register the user.
     elif instruction.isdigit():
       if registerUser(body[1:], phoneNumber):
         resp.sms("Welcome to convos, breh.")
       else:
         resp.sms("Verification code doesn't exist.")
+  # Otherwise, we need to route this message to whoever the user is currently conversing with.
   else:
     if user:
-      matchedUser = db.getMatchedUserForUser(user["id"])
-      matchedPhoneNumber = matchedUser["phone_number"]
-      message = client.sms.messages.create(to=matchedPhoneNumber, from_=twilio_phone_number, \
-        body="Partner: " + body)
+      conversation = db.getCurrentConversationForUser(user["id"])
+      if conversation:
+        # Get the matched user.
+        matchedUserId = conversation["user_two_id"] if conversation["user_one_id"] == user["id"]  \
+          else conversation["user_two_id"]
+        matchedUser = db.getUserFromId(matchedUserId)
+        matchedPhoneNumber = matchedUser["phone_number"]
+        
+        # Send the message via text.
+        message = client.sms.messages.create(to=matchedPhoneNumber, from_=twilio_phone_number, \
+          body="Partner: " + body)
+        
+        # Log the message in our own database.
+        db.insertMessageForConversation(conversation["id"], user["id"], body)
   return str(resp)
 
 # Attempts to register an existing user with the specified verification code.

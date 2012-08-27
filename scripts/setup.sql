@@ -33,6 +33,6 @@ CREATE TABLE  `convos`.`message` (
   `id` INT NOT NULL AUTO_INCREMENT ,
   `conversation_id` INT NOT NULL,
   `from_user_id` INT NOT NULL,
-  `content` VARCHAR (500) NOT NULL,
+  `body` VARCHAR (500) NOT NULL,
   PRIMARY KEY (  `id` )
 ) ENGINE = MYISAM;

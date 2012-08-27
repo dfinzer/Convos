@@ -6,6 +6,8 @@ PASSWORD = "convos"
 
 db = MySQLdb.connect(db=DATABASE, passwd=PASSWORD, cursorclass=MySQLdb.cursors.DictCursor)
 
+# TODO: see if we can use the same cursor for all of our queries.
+
 # Users:
 # Inserts a new user with pending registration status and specified verification code into the table.
 def insertUserFromFacebookData(facebookData, verificationCode):
@@ -29,7 +31,12 @@ def insertUserFromFacebookData(facebookData, verificationCode):
     verificationCode))
   db.commit()
 
-# Gets a user with the specified id.
+def getUserFromId(userId):
+  cursor = db.cursor()
+  cursor.execute("""SELECT * FROM user WHERE id = %s""", (userId))
+  return cursor.fetchone()
+
+# Gets a user with the specified Facebook uid.
 def getUserFromFacebookUid(facebookUid):
   cursor = db.cursor()
   cursor.execute("""SELECT * FROM user WHERE fb_uid = %s""", (facebookUid))
@@ -68,12 +75,18 @@ def insertConversation(userOneId, userTwoId):
   cursor.execute("""INSERT INTO conversation (user_one_id, user_two_id, in_progress) VALUES (%s, %s, True)""", \
     (userOneId, userTwoId))
 
-def getMatchedUserForUser(userId):
+def getCurrentConversationForUser(userId):
   cursor = db.cursor()
-  # TODO: filter out the user himself.
-  cursor.execute("""SELECT * FROM user WHERE id IN (SELECT user_one_id FROM conversation WHERE user_two_id = %s AND in_progress = True) \
-    OR id IN (SELECT user_two_id FROM conversation WHERE user_one_id = %s AND in_progress = True)""", (userId, userId))
+  cursor.execute("""SELECT * FROM conversation WHERE user_one_id = %s OR user_two_id = %s AND in_progress = True""", (userId, userId))
   return cursor.fetchone()
 
-def endConversation(userId):
-  pass
+# Ends any in-progress conversations for the user.
+def endCurrentConversationForUser(userId):
+  cursor = db.cursor()
+  cursor.execute("""UPDATE conversation SET in_progress = False WHERE user_one_id = %s OR user_two_id = %s AND in_progress = True""")
+  
+# Messages:
+def insertMessageForConversation(conversationId, fromUserId, body):
+  cursor = db.cursor()
+  cursor.execute("""INSERT INTO message (conversation_id, from_user_id, body) VALUES (%s, %s, %s)""", (conversationId, fromUserId, body))
+  
