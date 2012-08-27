@@ -25,11 +25,7 @@ function handleResponse(response) {
     $("#fb-login").unbind("click");
     $("#fb-login").text("Logout")
     $("#fb-login").click(facebookLogout);
-    uid = response.authResponse.userID;
-    FB.api("/me", function(data) {
-      loginData = {"name": data.name, "facebookId": data.id};
-      login(loginData);
-    });
+    login();
   } else {
     showLoginButton();
   }
