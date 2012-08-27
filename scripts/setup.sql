@@ -20,3 +20,18 @@ CREATE TABLE  `convos`.`user` (
   PRIMARY KEY (  `id` ),
   UNIQUE KEY (`fb_uid`)
 ) ENGINE = MYISAM;
+
+CREATE TABLE `convos`.`conversation` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `user_one_id` INT NOT NULL,
+  `user_two_id` INT NOT NULL,
+  PRIMARY KEY (  `id` )
+)
+
+CREATE TABLE  `convos`.`message` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `conversation_id` INT NOT NULL,
+  `from_user_id` INT NOT NULL,
+  `content` VARCHAR (500) NOT NULL,
+  PRIMARY KEY (  `id` )
+) ENGINE = MYISAM;

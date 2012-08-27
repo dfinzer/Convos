@@ -21,15 +21,31 @@ facebook_secret = 'd0347b67f972d8c3c751c7a29ee55b5d'
 
 @app.route("/message", methods=['POST'])
 def message():
-  body = request.values.get("Body")
+  body = request.values.get("Body").strip()
   phoneNumber = request.values.get("From")
   
   resp = twilio.twiml.Response()
+  # Check if this is an instruction.
   if body.startswith("#"):
-    if registerUser(body[1:], phoneNumber):
-      resp.sms("Welcome to convos, breh.")
-    else:
-      resp.sms("Verification code doesn't exist.")
+    instruction = body[1:]
+    
+    # Check if this user exists in the database.
+    user = db.getUserFromPhoneNumber(phoneNumber)
+    
+    # If there's a user, handle a user instruction.
+    if user:
+      userId = user["id"]
+      if instruction == "match":
+        matchedUser = db.getMatchForUser(userId)
+        if matchedUser:
+          conversation = db.insertConversation(userId, matchedUser["id"])
+          resp.sms("You have a new texting partner: %s" % (matchedUser["gender"]))
+    # If there's no user and the instruction is a digit, it's a verification code. So try to register the user.
+    elif instruction.isdigit():
+      if registerUser(body[1:], phoneNumber):
+        resp.sms("Welcome to convos, breh.")
+      else:
+        resp.sms("Verification code doesn't exist.")
   else:
     resp = twilio.twiml.Response()
     resp.sms("No functionality yet. Sorry breh.")
