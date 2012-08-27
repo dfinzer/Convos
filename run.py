@@ -1,3 +1,4 @@
+import db
 import facebook
 import json
 import twilio.twiml
@@ -29,14 +30,33 @@ def message():
   
   return str(resp)
 
+@app.route("/register", methods=['POST'])
+  # Get the verification code the user entered.
+  enteredVerificationCode = request.form["verification_code"]
+  
+  # Check it against the stored verification code.
+  user = facebook.get_user_from_cookie(request.cookies, facebook_app_id, facebook_secret)
+  
+  # TODO: check verification code.
+
 @app.route("/login", methods=['POST'])
 def login():
   user = facebook.get_user_from_cookie(request.cookies, facebook_app_id, facebook_secret)
   if user:
-    graph = facebook.GraphAPI(user["oauth_access_token"])
+    graph = facebook.GraphAPI(user["access_token"])
     profile = graph.get_object("me")
     friends = graph.get_connections("me", "friends")
     response = {"status": "ok"}
+    
+    # Check if this user already exists in the database.
+    existingUser = db.getUserFromFacebookUid(user["uid"])
+    if existingUser:
+      response = {"status": user["registration_status"]}
+    
+    # Create a new user, with registration status pending.
+    verificationCode = "12345"
+    db.insertUserFromFacebookData(profile, verificationCode)
+    response = {"status": "pending", "verification_code": verificationCode}
   else:
     response = {"status": "Not yet logged in with facebook."}
   return json.dumps(response)
