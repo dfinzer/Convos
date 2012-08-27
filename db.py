@@ -76,9 +76,8 @@ def getCurrentConversationForUser(userId):
   return cursor.fetchone()
 
 # Ends any in-progress conversations for the user.
-def endCurrentConversationForUser(userId):
-  cursor.execute("""UPDATE conversation SET in_progress = False WHERE user_one_id = %s OR user_two_id = %s \
-    AND in_progress = True""", (userId, userId))
+def endConversation(conversationId):
+  cursor.execute("""UPDATE conversation SET in_progress = False WHERE id = %s""", (conversationId))
   
 ## Messages:
 def insertMessageForConversation(conversationId, fromUserId, body):

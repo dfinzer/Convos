@@ -40,6 +40,11 @@ def message():
     handleMessage(body, user, resp)
   return str(resp)
 
+# Gets the other user id from a conversation.
+def getOtherUserId(conversation, user):
+  return conversation["user_two_id"] if conversation["user_one_id"] == user["id"]  \
+    else conversation["user_two_id"]
+
 # Handle an instruction from the user. Includes getting matches, stopping conversations, and verifying accounts.
 def handleInstruction(instruction, user, phoneNumber, resp):  
   # If there's a user, handle the instruction.
@@ -47,12 +52,27 @@ def handleInstruction(instruction, user, phoneNumber, resp):
     userId = user["id"]
     # Case: the user wants a new conversation.
     if instruction == "new":
-      # Unpause the user.
-      #db.unpauseUser(userId)
-      
       # If the user is currently in a conversation, end it.
-      db.endCurrentConversationForUser(userId)
+      db.getCurrentConversationForUser(user["id"])
+      if conversation:
+        matchedUserId = getOtherUserId(conversation, user)
+        db.endConversation(conversation["id"])
+        
+        # Notify the other user that the conversation has ended.
+        oldMatchedUser = db.getUserFromId(matchedUserId)
+        oldMatchedPhoneNumber = matchedUser["phone_number"]
       
+        # Look for a new match for this user.
+        newMatchForOldUser = db.getMatchForUser(userId)
+        
+        if newMatchForOldUser:
+          message = client.sms.messages.create(to=matchedPhoneNumber, from_=twilio_phone_number, \
+            body="Your current partner ended the conversation. We've matched you up with a new partner: %s %s" \
+            % (newMatchForOldUser["gender"], newMatchForOldUser["name"]))
+        else:
+          message = client.sms.messages.create(to=matchedPhoneNumber, from_=twilio_phone_number, \
+            body="Your current partner ended the conversation. We're looking for a new match and will text you when one is available.")
+
       # Get a new match for the user.
       matchedUser = db.getMatchForUser(userId)
       if matchedUser:
@@ -60,6 +80,7 @@ def handleInstruction(instruction, user, phoneNumber, resp):
         resp.sms("You have a new texting partner: %s %s" % (matchedUser["gender"], matchedUser["name"]))
       else:
         resp.sms("Looking for a match. You'll get a text when one is available!")
+        
     # Case: the user wants to pause service.
     elif instruction == "pause":
       db.pauseUser(userId)
@@ -78,8 +99,7 @@ def handleMessage(body, user, resp):
     conversation = db.getCurrentConversationForUser(user["id"])
     if conversation:
       # Get the matched user.
-      matchedUserId = conversation["user_two_id"] if conversation["user_one_id"] == user["id"]  \
-        else conversation["user_two_id"]
+      matchedUserId = getOtherUser(conversation, user)
       matchedUser = db.getUserFromId(matchedUserId)
       matchedPhoneNumber = matchedUser["phone_number"]
       
