@@ -5,9 +5,7 @@ function facebookLogin() {
 }
 
 function facebookLogout() {
-  FB.logout(function(response) {
-    logout();
-  });
+  FB.logout(function(response) { });
 }
 
 function showLoginButton() {
