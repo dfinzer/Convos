@@ -1,3 +1,4 @@
+import argparse
 import db
 import facebook
 import json
@@ -6,15 +7,20 @@ import twilio.twiml
 
 from flask import Flask
 from flask import request
-from twilio.rest import TwilioRestClient
+from twilioClient import TwilioClient, TwilioTestClient
 
 app = Flask(__name__)
 
-# Twilio configuration.
-account_sid = "AC52a3d465bd5577c994ebad881c1ac48a"
-auth_token = "5fdc4c5e212bd4e3301211631ad5e729"
-twilio_phone_number = "+19252720008"
-client = TwilioRestClient(account_sid, auth_token)
+# Parse command line options
+parser = argparse.ArgumentParser(description='Command line options for convos server.')
+parser.add_argument('--texting', action="store_true", default=False, dest="texting")
+args = parser.parse_args()
+
+# Enable/disable texting.
+if args.texting:
+  textingClient = TwilioClient()
+else:
+  textingClient = TwilioTestClient()
 
 # Facebook configuration.
 facebook_app_id = '326547147430900'
@@ -66,12 +72,11 @@ def handleInstruction(instruction, user, phoneNumber, resp):
         newMatchForOldUser = db.getMatchForUser(userId)
         
         if newMatchForOldUser:
-          message = client.sms.messages.create(to=matchedPhoneNumber, from_=twilio_phone_number, \
-            body="Your current partner ended the conversation. We've matched you up with a new partner: %s %s" \
+          textingClient.sendMessage(matchedPhoneNumber, "Your current partner ended the conversation. We've matched you up with a new partner: %s %s" \
             % (newMatchForOldUser["gender"], newMatchForOldUser["name"]))
         else:
-          message = client.sms.messages.create(to=matchedPhoneNumber, from_=twilio_phone_number, \
-            body="Your current partner ended the conversation. We're looking for a new match and will text you when one is available.")
+          textingClient.sendMessage(matchedPhoneNumber, \
+            "Your current partner ended the conversation. We're looking for a new match and will text you when one is available.")
 
       # Get a new match for the user.
       matchedUser = db.getMatchForUser(userId)
@@ -99,13 +104,12 @@ def handleMessage(body, user, resp):
     conversation = db.getCurrentConversationForUser(user["id"])
     if conversation:
       # Get the matched user.
-      matchedUserId = getOtherUser(conversation, user)
+      matchedUserId = getOtherUserId(conversation, user)
       matchedUser = db.getUserFromId(matchedUserId)
       matchedPhoneNumber = matchedUser["phone_number"]
       
       # Send the message via text.
-      #message = client.sms.messages.create(to=matchedPhoneNumber, from_=twilio_phone_number, \
-      #  body="Partner: " + body)
+      textingClient.sendMessage(matchedPhoneNumber, "Partner: " + body)
       
       # Log the message in our own database.
       db.insertMessageForConversation(conversation["id"], user["id"], body)
