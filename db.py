@@ -8,8 +8,11 @@ db = MySQLdb.connect(db=DATABASE, passwd=PASSWORD, cursorclass=MySQLdb.cursors.D
 cursor = db.cursor()
 
 # Gets the value of a key for a dictionary if it exists, otherwise returns NULL.
+def getValueOrAlt(dict, key, alt):
+  return dict[key] if key in dict else alt
+
 def getValueOrNull(dict, key):
-  return dict[key] if key in dict else "NULL"
+  return getValueOrAlt(dict, key, "NULL")
 
 ## Users:
 # Inserts a new user with pending registration status and specified verification code into the table.
@@ -27,7 +30,7 @@ def insertUserFromFacebookData(facebookData, verificationCode):
     getValueOrNull(facebookData, "username"), \
     getValueOrNull(facebookData, "gender"), \
     getValueOrNull(facebookData, "id"), \
-    getValueOrNull(facebookData, "verified"), \
+    getValueOrAlt(facebookData, "verified", "False"), \
     "pending", \
     verificationCode))
   db.commit()
@@ -55,14 +58,22 @@ def getUserFromPhoneNumber(phoneNumber):
 def registerUserWithPhoneNumber(userId, phoneNumber):
   cursor.execute("""UPDATE user SET phone_number = %s, registration_status = 'registered' WHERE id = %s""", \
     (phoneNumber, userId))
-      
+
+# Pausing/unpausing user.
+def pauseUser(userId):
+  cursor.execute("""UPDATE user SET paused = True WHERE id = %s""", (userId))
+
+def unpauseUser(userId):
+  cursor.execute("""UPDATE user SET paused = False WHERE id = %s""", (userId))
+
 ## Conversations:
 def getMatchForUser(userId):
   # Get all users that haven't been matched with this user and aren't currently in 'in-progress' conversations.
   cursor.execute("""SELECT * FROM user WHERE id NOT IN (SELECT user_one_id FROM conversation WHERE user_two_id = %s OR in_progress = True) \
     AND id NOT IN (SELECT user_two_id FROM conversation WHERE user_one_id = %s OR in_progress = True) \
     AND registration_status = 'registered'
-    AND id != %s""", (userId, userId, userId))
+    AND id != %s
+    AND paused = False""", (userId, userId, userId))
   return cursor.fetchone()
   
 # Inserts a new conversation with the two specified user id's.

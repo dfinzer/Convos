@@ -49,7 +49,7 @@ def message():
 # Gets the other user id from a conversation.
 def getOtherUserId(conversation, user):
   return conversation["user_two_id"] if conversation["user_one_id"] == user["id"]  \
-    else conversation["user_two_id"]
+    else conversation["user_one_id"]
 
 # Handle an instruction from the user. Includes getting matches, stopping conversations, and verifying accounts.
 def handleInstruction(instruction, user, phoneNumber, resp):  
@@ -58,6 +58,9 @@ def handleInstruction(instruction, user, phoneNumber, resp):
     userId = user["id"]
     # Case: the user wants a new conversation.
     if instruction == "new":
+      # Unpause the user.
+      db.unpauseUser(userId)
+      
       # If the user is currently in a conversation, end it.
       conversation = db.getCurrentConversationForUser(user["id"])
       if conversation:
@@ -89,7 +92,7 @@ def handleInstruction(instruction, user, phoneNumber, resp):
     # Case: the user wants to pause service.
     elif instruction == "pause":
       db.pauseUser(userId)
-      resp.sms("Paused. When you're read to start again, text #new to get a new conversation.")
+      resp.sms("Paused. When you're ready to start again, text #new to get a new conversation.")
       
   # If there's no user and the instruction is a digit, it's a verification code. So try to register the user.
   elif instruction.isdigit():
