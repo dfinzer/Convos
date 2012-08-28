@@ -178,6 +178,26 @@ def login():
     response = {"status": "error", "error": "Not yet logged in to Facebook."}
   return json.dumps(response)
   
+@app.route("/regenerate_verification", methods=['GET'])
+def regenerateVerification():
+  # See if the user_id got properly stored in the session variable.
+  if "user_id" in session:
+    user = db.getUserFromId(session["user_id"])
+    
+    if user:
+      if user["registration_status"] == "pending":
+        # Update with new verification code.
+        verificationCode = str(db.generateUniqueVerificationCode())
+        db.updateVerificationCodeForUser(user["id"], verificationCode)
+        response = {"status": "pending", "verification_code": verificationCode}
+      else:
+        response = {"status": "error", "error": "User is already registered."}
+    else:
+      response = {"status": "error", "error": "No user available for user id."}
+  else:
+    response = {"status": "error", "error": "No user session available."}
+  return json.dumps(response)
+
 @app.route("/registration_status", methods=['GET'])
 def registrationStatus():
   if "user_id" in session:
