@@ -134,7 +134,6 @@ def login():
   if user:
     graph = facebook.GraphAPI(user["access_token"])
     profile = graph.get_object("me")
-    friends = graph.get_connections("me", "friends")
     
     # Check if this user already exists in the database.
     existingUser = db.getUserFromFacebookUid(user["uid"])
