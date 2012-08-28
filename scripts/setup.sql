@@ -22,7 +22,8 @@ CREATE TABLE  `convos`.`user` (
   `phone_number` VARCHAR ( 100 ),
   `paused` BOOLEAN,
   PRIMARY KEY (  `id` ),
-  UNIQUE KEY (`fb_uid`)
+  UNIQUE KEY (`fb_uid`),
+  UNIQUE KEY (`phone_number`)
 ) ENGINE = MYISAM;
 
 CREATE TABLE `convos`.`conversation` (
