@@ -8,12 +8,7 @@ client = TwilioRestClient(account_sid, auth_token)
 
 class TwilioClient:
   def sendMessage(self, toNumber, body):
-    if len(body) > 160:
-      index = 0
-      while index < len(body)
-        bodyChunk = body[index:(index + 160)]
-        client.sms.messages.create(to=toNumber, from_=twilio_phone_number, body=bodyChunk)
-        index += 160
+    client.sms.messages.create(to=toNumber, from_=twilio_phone_number, body=body)
       
 class TwilioTestClient(TwilioClient):
   def sendMessage(self, toNumber, body):
