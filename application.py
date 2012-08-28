@@ -11,6 +11,7 @@ from strings import *
 from twilioClient import TwilioClient, TwilioTestClient
 
 app = Flask(__name__)
+app.debug = True
 
 # Parse command line options
 parser = argparse.ArgumentParser(description='Command line options for convos server.')

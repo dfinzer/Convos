@@ -8,6 +8,7 @@ client = TwilioRestClient(account_sid, auth_token)
 
 class TwilioClient:
   def sendMessage(self, toNumber, body):
+    print "Using Twilio to send message to %s, body {%s}" % (toNumber, body)
     client.sms.messages.create(to=toNumber, from_=twilio_phone_number, body=body)
       
 class TwilioTestClient(TwilioClient):
