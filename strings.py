@@ -16,6 +16,8 @@ PARTNER_ENDED_FINDING_MATCH = "Your current partner ended the conversation. \
 
 PAUSED = "Convos is now paused. When you're ready to start again, text #new to get a new conversation."
 
+UNKNOWN_MESSAGE = "Convos doesn't recognize this instruction. Valid instructions are: \
+  #new - new conversation, #pause - take a break."
 UNKNOWN_MESSAGE = "Convos doesn't recognize this phone number. If you are attempting to enter a verification code, \
   remember to include a # sign before the 4-digit verification code."
 

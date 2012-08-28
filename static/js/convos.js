@@ -23,7 +23,7 @@ function login() {
 }
 
 function showGetStartedBox() {
-  $("#verification-code-box").fadeOut("slow")
+  $("#verification-code-box").hide();
   $("#get-started-box").fadeIn("slow");
   clearInterval(pollingIntervalId)
 }

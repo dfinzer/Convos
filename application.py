@@ -110,6 +110,10 @@ def handleInstruction(instruction, user, phoneNumber, resp):
       # Pause this user.
       db.pauseUser(userId)
       resp.sms(PAUSED)
+    
+    # Case: unknown instruction
+    else:
+      resp.sms(UNKNOWN_INSTRUCTION)
       
   # If there's no user and the instruction is a digit, it's a verification code. So try to register the user.
   elif instruction.isdigit():
