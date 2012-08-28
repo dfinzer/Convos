@@ -1,4 +1,3 @@
-"""
 import argparse
 import db
 import facebook
@@ -169,20 +168,4 @@ def login():
   return json.dumps(response)
   
 if __name__ == "__main__":
-  app.run(debug=True)
-  
-"""
-import flask
- 
-application = flask.Flask(__name__)
-
-#Set application.debug=True to enable tracebacks on Beanstalk log output. 
-#Make sure to remove this line before deploying to production.
-application.debug=True
- 
-@application.route('/')
-def hello_world():
-    return "Hello world!"
- 
-if __name__ == '__main__':
-    application.run(debug=True)
+  app.run(debug=True, port=10080)
