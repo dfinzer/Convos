@@ -7,6 +7,7 @@ import twilio.twiml
 
 from flask import Flask
 from flask import request
+from strings import *
 from twilioClient import TwilioClient, TwilioTestClient
 
 app = Flask(__name__)
@@ -75,31 +76,30 @@ def handleInstruction(instruction, user, phoneNumber, resp):
         newMatchForOldUser = db.getMatchForUser(userId)
         
         if newMatchForOldUser:
-          textingClient.sendMessage(oldMatchedPhoneNumber, "Your current partner ended the conversation. We've matched you up with a new partner: %s %s" \
+          textingClient.sendMessage(oldMatchedPhoneNumber, PARTNER_ENDED_NEW_MATCH \
             % (newMatchForOldUser["gender"], newMatchForOldUser["name"]))
         else:
-          textingClient.sendMessage(oldMatchedPhoneNumber, \
-            "Your current partner ended the conversation. We're looking for a new match and will text you when one is available.")
+          textingClient.sendMessage(oldMatchedPhoneNumber, PARTNER_ENDED_NO_NEW_MATCH)
 
       # Get a new match for the user.
       newMatchedUser = db.getMatchForUser(userId)
       if newMatchedUser:
         conversation = db.insertConversation(userId, newMatchedUser["id"])
-        resp.sms("You have a new texting partner: %s %s" % (newMatchedUser["gender"], newMatchedUser["name"]))
+        resp.sms(NEW_MATCH % (newMatchedUser["gender"], newMatchedUser["name"]))
       else:
-        resp.sms("Looking for a match. You'll get a text when one is available!")
+        resp.sms(FINDING_MATCH)
         
     # Case: the user wants to pause service.
     elif instruction == "pause":
       db.pauseUser(userId)
-      resp.sms("Paused. When you're ready to start again, text #new to get a new conversation.")
+      resp.sms(PAUSED)
       
   # If there's no user and the instruction is a digit, it's a verification code. So try to register the user.
   elif instruction.isdigit():
     if registerUser(instruction, phoneNumber):
-      resp.sms("Welcome to convos, breh.")
+      resp.sms(WELCOME_MESSAGE)
     else:
-      resp.sms("Verification code doesn't exist.")
+      resp.sms(INCORRECT_VERIFICATION_CODE_MESSAGE)
 
 # Handle an incoming message. Route the message to the appropriate user.
 def handleMessage(body, user, resp):
