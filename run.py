@@ -19,6 +19,7 @@ args = parser.parse_args()
 
 # Enable/disable texting.
 if args.texting:
+  print "Texting enabled."
   textingClient = TwilioClient()
 else:
   textingClient = TwilioTestClient()
