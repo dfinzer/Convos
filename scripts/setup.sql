@@ -32,7 +32,7 @@ CREATE TABLE `convos`.`conversation` (
   `user_two_id` INT NOT NULL,
   `in_progress` BOOLEAN,
   PRIMARY KEY (  `id` )
-)
+) ENGINE = MYISAM;
 
 CREATE TABLE  `convos`.`message` (
   `id` INT NOT NULL AUTO_INCREMENT ,

@@ -1,4 +1,5 @@
-var APP_ID = '326547147430900';
+var DEV_APP_ID = '415440758502999';
+var PRODUCTION_APP_ID = '326547147430900';
 
 function facebookLogin() {
   FB.login(function(response) { }, {scope:'email,user_location,user_birthday'});
@@ -29,7 +30,14 @@ function handleResponse(response) {
 
 // Set up Facebook Javascript SDK.
 window.fbAsyncInit = function() {
-  FB.init({ appId: APP_ID, 
+  // Configure App ID based on production vs. dev.
+  if(window.location.toString().indexOf('localhost') != -1) {
+		appId = DEV_APP_ID;
+	} else {
+		appId = PRODUCTION_APP_ID;
+	}
+	
+  FB.init({ appId: appId, 
 	    status: true, 
 	    cookie: true,
 	    xfbml: true,

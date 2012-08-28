@@ -48,8 +48,8 @@ def generateUniqueVerificationCode():
 def insertUserFromFacebookData(facebookData, verificationCode):  
   # Insert a new user if one with the specified fb_uid does not already exist.
   cursor.execute("""INSERT INTO user (name, first_name, last_name, email, locale, username, gender, \
-    fb_uid, fb_verified, location_id, location_name, birthday, registration_status, verification_code) \
-    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""", \
+    fb_uid, fb_verified, location_id, location_name, birthday, registration_status, verification_code, paused) \
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 1)""", \
     userDataListFromFacebookData(facebookData) + ("pending", verificationCode))
 
 # Updates Facebook data for the user with the specified user id.

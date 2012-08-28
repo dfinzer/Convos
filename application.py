@@ -14,19 +14,22 @@ app = Flask(__name__)
 
 # Parse command line options
 parser = argparse.ArgumentParser(description='Command line options for convos server.')
-parser.add_argument('--texting', action="store_true", default=False, dest="texting")
+parser.add_argument('--debug', action="store_true", default=False, dest="debug")
 args = parser.parse_args()
 
 # Enable/disable texting.
-if args.texting:
-  print "Texting enabled."
+if not args.debug:
   textingClient = TwilioClient()
 else:
   textingClient = TwilioTestClient()
 
 # Facebook configuration.
-facebook_app_id = '326547147430900'
-facebook_secret = 'd0347b67f972d8c3c751c7a29ee55b5d'
+if not args.debug:
+  facebook_app_id = '326547147430900'
+  facebook_secret = 'd0347b67f972d8c3c751c7a29ee55b5d'
+else:
+  facebook_app_id = '415440758502999'
+  facebook_secret = 'd69147d6fba1690f5d10a591de591fa9'
 
 # Handles incoming text messages.
 @app.route("/message", methods=['POST'])
