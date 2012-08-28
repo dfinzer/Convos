@@ -159,7 +159,7 @@ def login():
       db.updateUserFromFacebookData(existingUser["id"], profile)
     else:
       # Create a new user, with registration status pending.
-      verificationCode = str(random.randint(1000, 10000))
+      verificationCode = str(db.generateUniqueVerificationCode())
       db.insertUserFromFacebookData(profile, verificationCode)
       response = {"status": "pending", "verification_code": verificationCode}
   else:
