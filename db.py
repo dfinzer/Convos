@@ -14,15 +14,13 @@ def getValueOrAlt(dict, key, alt):
 def getValueOrNull(dict, key):
   return getValueOrAlt(dict, key, "NULL")
 
-## Users:
-# Inserts a new user with pending registration status and specified verification code into the table.
-def insertUserFromFacebookData(facebookData, verificationCode):  
-  # TODO: check if the necessary user data is actually there.
-  # Insert a new user if one with the specified fb_uid does not already exist.
-  cursor.execute("""INSERT INTO user (name, first_name, last_name, email, locale, username, gender, \
-    fb_uid, fb_verified, registration_status, verification_code) \
-    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""", \
-    (getValueOrNull(facebookData, "name"), \
+def userDataListFromFacebookData(facebookData):
+  if "location" in facebookData:
+    location = facebookData["location"]
+    facebookData["location_id"] = location["id"]
+    facebookData["location_name"] = location["name"]
+  
+  return (getValueOrNull(facebookData, "name"), \
     getValueOrNull(facebookData, "first_name"), \
     getValueOrNull(facebookData, "last_name"), \
     getValueOrNull(facebookData, "email"), \
@@ -30,10 +28,37 @@ def insertUserFromFacebookData(facebookData, verificationCode):
     getValueOrNull(facebookData, "username"), \
     getValueOrNull(facebookData, "gender"), \
     getValueOrNull(facebookData, "id"), \
-    getValueOrAlt(facebookData, "verified", "False"), \
-    "pending", \
-    verificationCode))
-  db.commit()
+    getValueOrAlt(facebookData, "verified", "False"),
+    getValueOrNull(facebookData, "location_id"), \
+    getValueOrNull(facebookData, "location_name"), \
+    getValueOrNull(facebookData, "birthday"))
+    
+
+## Users:
+# Inserts a new user with pending registration status and specified verification code into the table.
+def insertUserFromFacebookData(facebookData, verificationCode):  
+  # Insert a new user if one with the specified fb_uid does not already exist.
+  cursor.execute("""INSERT INTO user (name, first_name, last_name, email, locale, username, gender, \
+    fb_uid, fb_verified, location_id, location_name, birthday, registration_status, verification_code) \
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""", \
+    userDataListFromFacebookData(facebookData) + ("pending", verificationCode))
+
+# Updates Facebook data for the user with the specified user id.
+def updateUserFromFacebookData(userId, facebookData):
+  cursor.execute("""UPDATE user SET \
+    name = %s, \
+    first_name = %s, \
+    last_name = %s, \
+    email = %s, \
+    locale = %s, \
+    username = %s, \
+    gender = %s, \
+    fb_uid = %s, \
+    fb_verified = %s, \
+    location_id = %s, \
+    location_name = %s, \
+    birthday = %s \
+    WHERE id = %s""", userDataListFromFacebookData(facebookData) + (userId,))
 
 def getUserFromId(userId):
   cursor.execute("""SELECT * FROM user WHERE id = %s""", (userId))

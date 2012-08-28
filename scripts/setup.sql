@@ -12,6 +12,9 @@ CREATE TABLE  `convos`.`user` (
   `locale` VARCHAR ( 100 ),
   `username` VARCHAR( 100 ),
   `gender` VARCHAR( 100 ),
+  `location_id` VARCHAR ( 100 ),
+  `location_name` VARCHAR ( 100 ),
+  `birthday` VARCHAR ( 100 ),
   `fb_uid` VARCHAR( 100 ),
   `fb_verified` BOOLEAN,
   `registration_status` VARCHAR( 100 ) NOT NULL, -- Can be pending or registered.

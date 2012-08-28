@@ -1,7 +1,7 @@
 var APP_ID = '326547147430900';
 
 function facebookLogin() {
-  FB.login(function(response) { }, {scope:'email'});
+  FB.login(function(response) { }, {scope:'email,user_location,user_birthday'});
 }
 
 function facebookLogout() {
