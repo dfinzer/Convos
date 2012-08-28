@@ -10,7 +10,7 @@ function facebookLogout() {
 
 function showLoginButton() {
   $("#fb-login").unbind("click");
-  $("#fb-login").text("Login with Facebook")
+  $("#fb-login").text("Login With Facebook")
   $("#fb-login").click(function() {
     facebookLogin();
   });
@@ -19,7 +19,7 @@ function showLoginButton() {
 function handleResponse(response) {
   if (response.authResponse) {
     $("#fb-login").unbind("click");
-    $("#fb-login").text("Logout")
+    $("#fb-login").text("Logout");
     $("#fb-login").click(facebookLogout);
     login();
   } else {

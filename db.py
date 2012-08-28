@@ -37,7 +37,11 @@ def userDataListFromFacebookData(facebookData):
 # Generates a unique verification code.
 def generateUniqueVerificationCode():
   cursor.execute("""SELECT verification_code FROM user WHERE registration_status = 'pending' ORDER BY verification_code DESC""")
-  code = int(cursor.fetchone()["verification_code"]) + 1
+  lastVerificationCode = cursor.fetchone()
+  if lastVerificationCode:
+    code = int(lastVerificationCode["verification_code"]) + 1
+  else:
+    code = 1000
   return code
 
 # Inserts a new user with pending registration status and specified verification code into the table.
