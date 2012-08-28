@@ -96,6 +96,9 @@ def handleInstruction(instruction, user, phoneNumber, resp):
       if newMatchedUser:
         db.insertConversation(userId, newMatchedUser["id"])
         resp.sms(NEW_MATCH % (newMatchedUser["gender"], newMatchedUser["name"]))
+        
+        # Notify the matched user.
+        textingClient.sendMessage(newMatchedUser["phone_number"], NEW_MATCH % (user["gender"], user["name"]))
       else:
         resp.sms(FINDING_MATCH)
         
