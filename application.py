@@ -5,13 +5,13 @@ import json
 import random
 import twilio.twiml
 
-from flask import Flask
-from flask import request
+from flask import Flask, request, session
 from strings import *
 from twilioClient import TwilioClient, TwilioTestClient
 
 app = Flask(__name__)
 app.debug = True
+app.secret_key = 'abcdefgh123456'
 
 # Parse command line options
 parser = argparse.ArgumentParser(description='Command line options for convos server.')
@@ -170,8 +170,21 @@ def login():
       verificationCode = str(db.generateUniqueVerificationCode())
       db.insertUserFromFacebookData(profile, verificationCode)
       response = {"status": "pending", "verification_code": verificationCode}
+      existingUser = db.getUserFromFacebookUid(user["uid"])
+    
+    # Set a session variable so we can keep track of this user.
+    session["user_id"] = existingUser["id"]
   else:
     response = {"status": "error", "error": "Not yet logged in to Facebook."}
+  return json.dumps(response)
+  
+@app.route("/registration_status", methods=['GET'])
+def registrationStatus():
+  if "user_id" in session:
+    user = db.getUserFromId(session["user_id"])
+    response = {"status": user["registration_status"]}
+  else:
+    response = {"status": "nonexistent"}
   return json.dumps(response)
   
 if __name__ == "__main__":
