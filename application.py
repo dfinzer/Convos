@@ -84,6 +84,28 @@ def interestArrayFromFacebookLikeData(facebookLikeData):
         interests += likeNameList
   return interests
 
+def findMostRecentCollegeFromFacebookData(facebookData):
+  maxYear = 0
+  maxCollege = None
+  college = None
+  for education in facebookData["education"]:
+    print education
+    if "school" in education and "name" in education["school"] and "type" in education and education["type"] == "College":
+      if "year" in education:
+        year = education["year"]
+        # Go for the most recent year.
+        if "name" in year and year["name"].isdigit():
+          currentYear = int(year["name"])
+          if currentYear > maxYear:
+            maxYear = currentYear
+            maxCollege = education["school"]["name"]
+      else:
+        if not maxCollege:
+          maxCollege = education["school"]["name"]
+  if maxCollege:
+    return maxCollege + ", " + str(maxYear) if maxYear != 0 else maxCollege
+  return None
+
 # Ends the specified conversation and gets a new match for the rejected partner.
 def endConversationForUserAndGetNewMatchForPartner(user):
   conversation = db.getCurrentConversationForUser(user["id"])
