@@ -19,19 +19,16 @@ parser = argparse.ArgumentParser(description='Command line options for convos se
 parser.add_argument('--debug', action="store_true", default=False, dest="debug")
 args = parser.parse_args()
 
-# Enable/disable texting.
-if not args.debug:
-  textingClient = TwilioClient()
-else:
+# Development configuration.
+if args.debug:
   textingClient = TwilioTestClient()
-
-# Facebook configuration.
-if not args.debug:
-  facebookAppId = DEBUG_FACEBOOK_ID
-  facebookSecret = DEBUG_FACEBOOK_SECRET
-else:
   facebookAppId = PROD_FACEBOOK_ID
   facebookSecret = PROD_FACEBOOK_SECRET
+# Prod configuration.
+else:
+  textingClient = TwilioClient()
+  facebookAppId = DEBUG_FACEBOOK_ID
+  facebookSecret = DEBUG_FACEBOOK_SECRET
 
 # Handles incoming text messages.
 @app.route("/message", methods=['POST'])
