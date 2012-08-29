@@ -34,7 +34,8 @@ def userDataListFromFacebookData(facebookData):
     getValueOrAlt(facebookData, "verified", 0),
     getValueOrNull(facebookData, "location_id"), \
     getValueOrNull(facebookData, "location_name"), \
-    getValueOrNull(facebookData, "birthday"))
+    getValueOrNull(facebookData, "birthday"), \
+    getValueOrNull(facebookData, "college"))
     
 ## Users:
 # Generates a unique verification code.
@@ -51,8 +52,8 @@ def generateUniqueVerificationCode():
 def insertUserFromFacebookData(facebookData, verificationCode):  
   # Insert a new user if one with the specified fb_uid does not already exist.
   cursor.execute("""INSERT INTO user (name, first_name, last_name, email, locale, username, gender, \
-    fb_uid, fb_verified, location_id, location_name, birthday, registration_status, verification_code, paused) \
-    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 1)""", \
+    fb_uid, fb_verified, location_id, location_name, birthday, college, registration_status, verification_code, paused) \
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 1)""", \
     userDataListFromFacebookData(facebookData) + ("pending", verificationCode))
 
 # Updates Facebook data for the user with the specified user id.
@@ -69,12 +70,19 @@ def updateUserFromFacebookData(userId, facebookData):
     fb_verified = %s, \
     location_id = %s, \
     location_name = %s, \
-    birthday = %s \
+    birthday = %s, \
+    college = %s \
     WHERE id = %s""", userDataListFromFacebookData(facebookData) + (userId,))
 
 def getUserFromId(userId):
   cursor.execute("""SELECT * FROM user WHERE id = %s""", (userId))
   return cursor.fetchone()
+  
+def getUserInterests(userId):
+  cursor.execute("""SELECT interest.name FROM user_interest, interest \
+    WHERE user_interest.user_id = %s AND interest.id = user_interest.interest_id""", (userId))
+  interests = map(lambda i : i["name"], cursor.fetchall())
+  return interests
 
 # Gets a user with the specified Facebook uid.
 def getUserFromFacebookUid(facebookUid):

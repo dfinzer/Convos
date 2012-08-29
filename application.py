@@ -124,12 +124,12 @@ def endConversationForUserAndGetNewMatchForPartner(user):
       db.insertConversation(oldMatchedUserId, newMatchForOldUser["id"])
       
       # Update the old user.
-      textingClient.sendMessage(oldMatchedPhoneNumber, PARTNER_ENDED_NEW_MATCH \
-        % (newMatchForOldUser["gender"], newMatchForOldUser["name"]))
+      textingClient.sendMessage(oldMatchedPhoneNumber, partnerEndedNewMatchString(newMatchForOldUser["gender"], \
+        newMatchForOldUser["college"], db.getUserInterests(newMatchForOldUser["id"])))
         
       # Update the old user's new match.
-      textingClient.sendMessage(newMatchForOldUser["phone_number"], NEW_MATCH \
-        % (oldMatchedUser["gender"], oldMatchedUser["name"]))
+      textingClient.sendMessage(newMatchForOldUser["phone_number"], newMatchString(oldMatchedUser["gender"], \
+        oldMatchedUser["college"], db.getUserInterests(oldMatchedUser["id"])))
     else:
       textingClient.sendMessage(oldMatchedPhoneNumber, PARTNER_ENDED_FINDING_MATCH)  
 
@@ -150,10 +150,10 @@ def handleInstruction(instruction, user, phoneNumber, resp):
       newMatchedUser = db.getMatchForUser(userId)
       if newMatchedUser:
         db.insertConversation(userId, newMatchedUser["id"])
-        resp.sms(NEW_MATCH % (newMatchedUser["gender"], newMatchedUser["name"]))
+        resp.sms(newMatchString(newMatchedUser["gender"], newMatchedUser["college"], db.getUserInterests(newMatchedUser["id"])))
         
         # Notify the matched user.
-        textingClient.sendMessage(newMatchedUser["phone_number"], NEW_MATCH % (user["gender"], user["name"]))
+        textingClient.sendMessage(newMatchedUser["phone_number"], newMatchString(user["gender"], user["college"], db.getUserInterests(user["id"])))
       else:
         resp.sms(FINDING_MATCH)
         
@@ -207,7 +207,10 @@ def login():
     profile = graph.get_object("me")
     
     # Update the user's network and education data.
-    interestData = graph.fql("SELECT " + ",".join(FACEBOOK_INTERESTS) + " FROM user WHERE uid = me()")
+    facebookData = graph.fql("SELECT " + ",".join(FACEBOOK_INTERESTS) + ", education FROM user WHERE uid = me()")
+    collegeString = findMostRecentCollegeFromFacebookData(facebookData[0])
+    if collegeString:
+      profile["college"] = collegeString
     
     # Check if this user already exists in the database.
     existingUser = db.getUserFromFacebookUid(user["uid"])
@@ -228,7 +231,7 @@ def login():
       existingUser = db.getUserFromFacebookUid(user["uid"])
     
     # Record the user interests in the database.
-    interests = interestArrayFromFacebookLikeData(interestData[0])
+    interests = interestArrayFromFacebookLikeData(facebookData[0])
     db.setUserInterests(existingUser["id"], interests)
     
     # Set a session variable so we can keep track of this user.
