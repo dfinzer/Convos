@@ -45,11 +45,20 @@ def message():
   resp = twilio.twiml.Response()
   
   # Check if this is an instruction.
-  if body.startswith("#"):
-    handleInstruction(body[1:], user, phoneNumber, resp)
-  # Otherwise, we need to route this message.
+  if user:
+    if body.startswith("#"):
+      handleInstruction(body[1:], user, phoneNumber, resp)
+    # Otherwise, we need to route this message.
+    else:
+      handleMessage(body, user, resp)
+  # If there's no user and the instruction is a digit, it's a verification code. So try to register the user.
+  elif body.isdigit():
+    if registerUser(instruction, phoneNumber):
+      resp.sms(WELCOME_MESSAGE)
+    else:
+      resp.sms(INCORRECT_VERIFICATION_CODE_MESSAGE)
   else:
-    handleMessage(body, user, resp)
+    resp.sms(UNKNOWN_MESSAGE)
   return str(resp)
 
 # Gets the other user id from a conversation.
@@ -73,8 +82,14 @@ def endConversationForUserAndGetNewMatchForPartner(user):
     # If we found a match, make a new conversation and text the user.
     if newMatchForOldUser:
       db.insertConversation(oldMatchedUserId, newMatchForOldUser["id"])
+      
+      # Update the old user.
       textingClient.sendMessage(oldMatchedPhoneNumber, PARTNER_ENDED_NEW_MATCH \
         % (newMatchForOldUser["gender"], newMatchForOldUser["name"]))
+        
+      # Update the old user's new match.
+      textingClient.sendMessage(newMatchForOldUser["phone_number"], NEW_MATCH \
+        % (oldMatchedUser["gender"], oldMatchedUser["name"]))
     else:
       textingClient.sendMessage(oldMatchedPhoneNumber, PARTNER_ENDED_FINDING_MATCH)  
 
@@ -114,15 +129,6 @@ def handleInstruction(instruction, user, phoneNumber, resp):
     # Case: unknown instruction
     else:
       resp.sms(UNKNOWN_INSTRUCTION)
-      
-  # If there's no user and the instruction is a digit, it's a verification code. So try to register the user.
-  elif instruction.isdigit():
-    if registerUser(instruction, phoneNumber):
-      resp.sms(WELCOME_MESSAGE)
-    else:
-      resp.sms(INCORRECT_VERIFICATION_CODE_MESSAGE)
-  else:
-    resp.sms(UNKNOWN_MESSAGE)
 
 # Handle an incoming message. Route the message to the appropriate user.
 def handleMessage(body, user, resp):

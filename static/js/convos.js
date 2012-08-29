@@ -7,7 +7,7 @@ function login() {
   $.post("/login", {}, function(response) {
     data = $.parseJSON(response);
     if (data.status == "pending") {
-      $("#verification-code").text("#" + data.verification_code)
+      $("#verification-code").text(data.verification_code)
       $("#verification-code-box").fadeIn("slow");
       
       // Poll for the user's registration status, so we can auto-update the page.
