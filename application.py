@@ -27,11 +27,11 @@ else:
 
 # Facebook configuration.
 if not args.debug:
-  facebook_app_id = DEBUG_FACEBOOK_ID
-  facebook_secret = DEBUG_FACEBOOK_SECRET
+  facebookAppId = DEBUG_FACEBOOK_ID
+  facebookSecret = DEBUG_facebookSecret
 else:
-  facebook_app_id = PROD_FACEBOOK_ID
-  facebook_secret = PROD_FACEBOOK_SECRET
+  facebookAppId = PROD_FACEBOOK_ID
+  facebookSecret = PROD_facebookSecret
 
 # Handles incoming text messages.
 @app.route("/message", methods=['POST'])
@@ -160,7 +160,7 @@ def registerUser(verificationCode, phoneNumber):
 
 @app.route("/login", methods=['POST'])
 def login():
-  user = facebook.get_user_from_cookie(request.cookies, facebook_app_id, facebook_secret)
+  user = facebook.get_user_from_cookie(request.cookies, facebookAppId, facebookSecret)
   
   # TODO: just check the user's session uid instead of going to Facebook every time.
   if user:
