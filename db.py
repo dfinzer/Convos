@@ -77,12 +77,6 @@ def updateUserFromFacebookData(userId, facebookData):
 def getUserFromId(userId):
   cursor.execute("""SELECT * FROM user WHERE id = %s""", (userId))
   return cursor.fetchone()
-  
-def getUserInterests(userId):
-  cursor.execute("""SELECT interest.name FROM user_interest, interest \
-    WHERE user_interest.user_id = %s AND interest.id = user_interest.interest_id""", (userId))
-  interests = map(lambda i : i["name"], cursor.fetchall())
-  return interests
 
 # Gets a user with the specified Facebook uid.
 def getUserFromFacebookUid(facebookUid):
@@ -123,6 +117,12 @@ def setUserInterests(userId, interests):
     interestInString = "(%s)" % ",".join(map(lambda s : "'%s'" % s, interests))
     cursor.execute("""INSERT IGNORE INTO user_interest (user_id, interest_id) SELECT user.id, interest.id \
       FROM user, interest WHERE user.id = %s AND interest.name IN """ + interestInString, (userId,))
+
+def getUserInterests(userId):
+  cursor.execute("""SELECT interest.name FROM user_interest, interest \
+    WHERE user_interest.user_id = %s AND interest.id = user_interest.interest_id""", (userId))
+  interests = map(lambda i : i["name"], cursor.fetchall())
+  return interests
 
 ## Conversations:
 def getMatchForUser(userId):
