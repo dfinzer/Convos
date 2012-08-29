@@ -107,10 +107,10 @@ def unpauseUser(userId):
 def insertInterestsIfNonexistent(interests):
   cursor.executemany("""INSERT IGNORE INTO interest (name) VALUES (%s)""", map(lambda i : (i), interests))
   
-def setUserInterests(userId, interestNames):
-  interests = interestNames.split(", ")
+def setUserInterests(userId, interests):
   if len(interests) > 0:
     insertInterestsIfNonexistent(interests)
+    
     # TODO: this is a major hack, we shouldn't be appending raw strings.
     interestInString = "(%s)" % ",".join(map(lambda s : "'%s'" % s, interests))
     cursor.execute("""INSERT IGNORE INTO user_interest (user_id, interest_id) SELECT user.id, interest.id \

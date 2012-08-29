@@ -30,6 +30,10 @@ else:
   facebookAppId = DEBUG_FACEBOOK_ID
   facebookSecret = DEBUG_FACEBOOK_SECRET
 
+# Facebook interests to track
+FACEBOOK_INTERESTS = ["movies", "music", "books", "tv", "languages", \
+  "games", "sports", "favorite_athletes", "favorite_teams", "inspirational_people"]
+
 # Handles incoming text messages.
 @app.route("/message", methods=['POST'])
 def message():
@@ -63,6 +67,23 @@ def message():
 def getOtherUserId(conversation, user):
   return conversation["user_two_id"] if conversation["user_one_id"] == user["id"]  \
     else conversation["user_one_id"]
+
+# Generates an array of interests (strings) from a more complex array of Facebook data.
+def interestArrayFromFacebookLikeData(facebookLikeData):
+  interests = []
+  for facebookInterest in FACEBOOK_INTERESTS:
+    if facebookInterest in facebookLikeData:
+      facebookLike = facebookLikeData[facebookInterest]
+      print type(facebookLike)
+      if type(facebookLike) is unicode and len(facebookLike) > 0:
+        interests += (facebookLike.split(", "))
+      elif type(facebookLike) is list and len(facebookLike) > 0:
+        likeNameList = []
+        for like in facebookLike:
+          if "name" in like:
+            likeNameList.append(like["name"])
+        interests += likeNameList
+  return interests
 
 # Ends the specified conversation and gets a new match for the rejected partner.
 def endConversationForUserAndGetNewMatchForPartner(user):
@@ -165,7 +186,7 @@ def login():
     profile = graph.get_object("me")
     
     # Update the user's network and education data.
-    interestData = graph.fql("SELECT movies FROM user WHERE uid = me()")
+    interestData = graph.fql("SELECT " + ",".join(FACEBOOK_INTERESTS) + " FROM user WHERE uid = me()")
     
     # Check if this user already exists in the database.
     existingUser = db.getUserFromFacebookUid(user["uid"])
@@ -185,7 +206,9 @@ def login():
       response = {"status": "pending", "verification_code": verificationCode}
       existingUser = db.getUserFromFacebookUid(user["uid"])
     
-    db.setUserInterests(existingUser["id"], interestData[0]["movies"])
+    # Record the user interests in the database.
+    interests = interestArrayFromFacebookLikeData(interestData[0])
+    db.setUserInterests(existingUser["id"], interests)
     
     # Set a session variable so we can keep track of this user.
     session["user_id"] = existingUser["id"]
