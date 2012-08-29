@@ -28,10 +28,10 @@ else:
 # Facebook configuration.
 if not args.debug:
   facebookAppId = DEBUG_FACEBOOK_ID
-  facebookSecret = DEBUG_facebookSecret
+  facebookSecret = DEBUG_FACEBOOK_SECRET
 else:
   facebookAppId = PROD_FACEBOOK_ID
-  facebookSecret = PROD_facebookSecret
+  facebookSecret = PROD_FACEBOOK_SECRET
 
 # Handles incoming text messages.
 @app.route("/message", methods=['POST'])
