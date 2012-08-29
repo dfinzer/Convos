@@ -5,6 +5,7 @@ import json
 import random
 import twilio.twiml
 
+from constants import *
 from flask import Flask, request, session
 from strings import *
 from twilioClient import TwilioClient, TwilioTestClient
@@ -26,11 +27,11 @@ else:
 
 # Facebook configuration.
 if not args.debug:
-  facebook_app_id = '326547147430900'
-  facebook_secret = 'd0347b67f972d8c3c751c7a29ee55b5d'
+  facebook_app_id = DEBUG_FACEBOOK_ID
+  facebook_secret = DEBUG_FACEBOOK_SECRET
 else:
-  facebook_app_id = '415440758502999'
-  facebook_secret = 'd69147d6fba1690f5d10a591de591fa9'
+  facebook_app_id = PROD_FACEBOOK_ID
+  facebook_secret = PROD_FACEBOOK_SECRET
 
 # Handles incoming text messages.
 @app.route("/message", methods=['POST'])
@@ -160,9 +161,15 @@ def registerUser(verificationCode, phoneNumber):
 @app.route("/login", methods=['POST'])
 def login():
   user = facebook.get_user_from_cookie(request.cookies, facebook_app_id, facebook_secret)
+  
+  # TODO: just check the user's session uid instead of going to Facebook every time.
   if user:
     graph = facebook.GraphAPI(user["access_token"])
     profile = graph.get_object("me")
+    
+    # Update the user's network and education data.
+    networkAndEducationData = graph.fql("SELECT affiliations, education FROM user WHERE uid = me()")
+    print networkAndEducationData
     
     # Check if this user already exists in the database.
     existingUser = db.getUserFromFacebookUid(user["uid"])
