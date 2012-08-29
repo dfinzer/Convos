@@ -1,3 +1,4 @@
+from testUtils import sendMessage
 from twilio.rest import TwilioRestClient
 
 # Twilio configuration.
@@ -13,4 +14,6 @@ class TwilioClient:
       
 class TwilioTestClient(TwilioClient):
   def sendMessage(self, toNumber, body):
+    # We use the port as the phone number.
+    sendMessage("localhost", toNumber, TWILIO_PHONE_NUMBER, body)
     print "Sending message to %s, body: {%s}" % (toNumber, body)
