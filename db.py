@@ -7,13 +7,16 @@ PASSWORD = "convos"
 db = MySQLdb.connect(db=DATABASE, passwd=PASSWORD, cursorclass=MySQLdb.cursors.DictCursor)
 cursor = db.cursor()
 
-# Gets the value of a key for a dictionary if it exists, otherwise returns NULL.
+## Helper methods.
+# Gets the value of a key for a dictionary if it exists, otherwise returns alt.
 def getValueOrAlt(dict, key, alt):
   return dict[key] if key in dict else alt
 
+# Gets the value of a dict if it exists, otherwise 'NULL'.
 def getValueOrNull(dict, key):
   return getValueOrAlt(dict, key, "NULL")
 
+# Turns facebook data into a convenient list.
 def userDataListFromFacebookData(facebookData):
   if "location" in facebookData:
     location = facebookData["location"]
