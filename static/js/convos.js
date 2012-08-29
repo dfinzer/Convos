@@ -26,6 +26,7 @@ function login() {
 
 function showErrorBox() {
   $("#error-box").show();
+  $("#loader").hide();
   $("#verification-code-box").hide();
 }
 
