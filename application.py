@@ -74,7 +74,6 @@ def interestArrayFromFacebookLikeData(facebookLikeData):
   for facebookInterest in FACEBOOK_INTERESTS:
     if facebookInterest in facebookLikeData:
       facebookLike = facebookLikeData[facebookInterest]
-      print type(facebookLike)
       if type(facebookLike) is unicode and len(facebookLike) > 0:
         interests += (facebookLike.split(", "))
       elif type(facebookLike) is list and len(facebookLike) > 0:

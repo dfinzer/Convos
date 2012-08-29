@@ -19,7 +19,14 @@ function login() {
       showGetStartedBox();
     }
     $("#loader").hide();
+  }).error(function() {
+    showErrorBox();
   });
+}
+
+function showErrorBox() {
+  $("#error-box").show();
+  $("#verification-code-box").hide();
 }
 
 function showGetStartedBox() {
@@ -34,5 +41,8 @@ function pollRegistrationStatus() {
     if (data.status == "registered") {
       showGetStartedBox();
     }
+  }).error(function() {
+    showErrorBox();
+    clearInterval(pollingIntervalId)
   });
 }
