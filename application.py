@@ -30,10 +30,6 @@ else:
   facebookAppId = DEBUG_FACEBOOK_ID
   facebookSecret = DEBUG_FACEBOOK_SECRET
 
-# Facebook interests to track
-FACEBOOK_INTERESTS = ["movies", "music", "books", "tv", "languages", \
-  "games", "sports", "favorite_athletes", "favorite_teams", "inspirational_people"]
-
 # Handles incoming text messages.
 @app.route("/message", methods=['POST'])
 def message():
