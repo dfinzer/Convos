@@ -18,7 +18,6 @@ PAUSED = "Convos is now paused. When you're ready to start again, text #new to g
 
 UNKNOWN_MESSAGE = "Convos doesn't recognize this instruction. Valid instructions are: \
   #new - new conversation, #pause - take a break."
-UNKNOWN_MESSAGE = "Convos doesn't recognize this phone number. If you are attempting to enter a verification code, \
-  remember to include a # sign before the 4-digit verification code."
+UNKNOWN_MESSAGE = "Convos doesn't recognize this phone number. Please check that you entered the correct four-digit verification code."
 
 PHONE_NUMBER_ALREADY_REGISTERED = "This phone number is already registered with Convos. Please use a different phone number."
