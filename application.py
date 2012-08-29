@@ -165,8 +165,7 @@ def login():
     profile = graph.get_object("me")
     
     # Update the user's network and education data.
-    networkAndEducationData = graph.fql("SELECT affiliations, education FROM user WHERE uid = me()")
-    print networkAndEducationData
+    interestData = graph.fql("SELECT movies FROM user WHERE uid = me()")
     
     # Check if this user already exists in the database.
     existingUser = db.getUserFromFacebookUid(user["uid"])
@@ -185,6 +184,8 @@ def login():
       db.insertUserFromFacebookData(profile, verificationCode)
       response = {"status": "pending", "verification_code": verificationCode}
       existingUser = db.getUserFromFacebookUid(user["uid"])
+    
+    db.setUserInterests(existingUser["id"], interestData[0]["movies"])
     
     # Set a session variable so we can keep track of this user.
     session["user_id"] = existingUser["id"]

@@ -38,6 +38,21 @@ CREATE TABLE  `convos`.`message` (
   `id` INT NOT NULL AUTO_INCREMENT ,
   `conversation_id` INT NOT NULL,
   `from_user_id` INT NOT NULL,
-  `body` VARCHAR (500) NOT NULL,
+  `body` VARCHAR ( 500 ) NOT NULL,
   PRIMARY KEY (  `id` )
+) ENGINE = MYISAM;
+
+CREATE TABLE `convos`.`interest` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR ( 500 ) NOT NULL,
+  PRIMARY KEY (  `id` ),
+  UNIQUE KEY (`name`)
+) ENGINE = MYISAM;
+
+CREATE TABLE `convos`.`user_interest` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `user_id` INT NOT NULL,
+  `interest_id` INT NOT NULL,
+  PRIMARY KEY (  `id` ),
+  UNIQUE KEY `user_id` (`user_id`, `interest_id`)
 ) ENGINE = MYISAM;

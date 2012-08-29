@@ -103,6 +103,19 @@ def pauseUser(userId):
 def unpauseUser(userId):
   cursor.execute("""UPDATE user SET paused = 0 WHERE id = %s""", (userId))
 
+## Interests:
+def insertInterestsIfNonexistent(interests):
+  cursor.executemany("""INSERT IGNORE INTO interest (name) VALUES (%s)""", map(lambda i : (i), interests))
+  
+def setUserInterests(userId, interestNames):
+  interests = interestNames.split(", ")
+  if len(interests) > 0:
+    insertInterestsIfNonexistent(interests)
+    # TODO: this is a major hack, we shouldn't be appending raw strings.
+    interestInString = "(%s)" % ",".join(map(lambda s : "'%s'" % s, interests))
+    cursor.execute("""INSERT IGNORE INTO user_interest (user_id, interest_id) SELECT user.id, interest.id \
+      FROM user, interest WHERE user.id = %s AND interest.name IN """ + interestInString, (userId,))
+
 ## Conversations:
 def getMatchForUser(userId):
   # Get all users that haven't been matched with this user and aren't currently in 'in-progress' conversations.
