@@ -53,7 +53,7 @@ def message():
       handleMessage(body, user, resp)
   # If there's no user and the instruction is a digit, it's a verification code. So try to register the user.
   elif body.isdigit():
-    if registerUser(instruction, phoneNumber):
+    if registerUser(body, phoneNumber):
       resp.sms(WELCOME_MESSAGE)
     else:
       resp.sms(INCORRECT_VERIFICATION_CODE_MESSAGE)
