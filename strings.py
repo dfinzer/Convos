@@ -72,7 +72,7 @@ def arrayOfAppropriateLengthStringsFromString(string):
       
       # If we found a good index, return it.
       if bestIndex != -1:
-        return [string[0:bestIndex], string[bestIndex:stringLength]]
+        return [string[0:bestIndex], string[bestIndex:]]
       # Otherwise just brute force it.
       else:
         return bruteForceArrayOfAppropriateLengthStringsFromString(string)
