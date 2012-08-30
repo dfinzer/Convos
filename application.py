@@ -39,9 +39,9 @@ else:
   app.logger.addHandler(fileHandler)
   
   # Set up email.
+  from smtp import TlsSMTPHandler
   ADMINS = ['dfinzer2@gmail.com.com']
-  mail_handler = SMTPHandler('email-smtp.us-east-1.amazonaws.com', 'dfinzer2@gmail.com',
-    ADMINS, 'Convos Failed', credentials=('AKIAJVZYBPD2LLMWMDAA', 'Alwl4cvm2242mRq5r9h/2PgAfZ8FHJLTeAqTBO+R8CZP'))
+  mail_handler = TlsSMTPHandler('email-smtp.us-east-1.amazonaws.com', 'dfinzer2@gmail.com', ADMINS, 'Convos Failed', credentials=('AKIAJVZYBPD2LLMWMDAA', 'Alwl4cvm2242mRq5r9h/2PgAfZ8FHJLTeAqTBO+R8CZP'))
   mail_handler.setLevel(logging.ERROR)
   app.logger.addHandler(mail_handler)
 
