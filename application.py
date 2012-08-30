@@ -85,7 +85,6 @@ def findMostRecentCollegeFromFacebookData(facebookData):
   maxCollege = None
   college = None
   for education in facebookData["education"]:
-    print education
     if "school" in education and "name" in education["school"] and "type" in education and education["type"] == "College":
       if "year" in education:
         year = education["year"]
@@ -130,13 +129,13 @@ def makeMatchAndNotify(user, partnerEndedMatch, resp=None):
         newMatchedUserInterests)
     else:
       textingClient.sendNewMatchMessage(userPhoneNumber, newMatchedUser, \
-        newMatchedUserInterests)
+        newMatchedUserInterests, resp)
         
     # Notify the matched user.
     textingClient.sendNewMatchMessage(newMatchedUser["phone_number"], user, db.getUserInterests(user["id"]))
   else:
-    if partnerEndedNewMatch:
-      textingClient.sendPartnerEndedFindingMatchMessage
+    if partnerEndedMatch:
+      textingClient.sendPartnerEndedFindingMatchMessage(userPhoneNumber)
     else:
       textingClient.sendFindingMatchMessage(userPhoneNumber, resp)
 

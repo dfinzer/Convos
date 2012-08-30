@@ -95,7 +95,7 @@ def newMatchString(gender, college, interests, newMatchMessage=NEW_MATCH):
   if gender:
     newPartnerString += gender + ", "
   if college:
-    newPartnerString += abbreviatedCollegeString(college)
+    newPartnerString += "from " + abbreviatedCollegeString(college)
   if len(interests) > 0:
     newPartnerString += " with interests in "
     newPartnerString += ", ".join(interests[:3])

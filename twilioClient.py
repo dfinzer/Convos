@@ -1,6 +1,6 @@
 import twilio.twiml
 
-from strings import arrayOfAppropriateLengthStringsFromString
+from strings import *
 from testUtils import sendMessage
 from twilio.rest import TwilioRestClient
 
@@ -12,11 +12,14 @@ TWILIO_PHONE_NUMBER = "+19252720008"
 client = TwilioRestClient(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
 class TwilioClient:
-  def sendMessage(self, toNumber, body, existingResponse):    
+  def sendMessage(self, toNumber, body, existingResponse=None):    
     bodyStrings = arrayOfAppropriateLengthStringsFromString(body)
+    individualMessageBodyIndex = 0
     if existingResponse:
       existingResponse.sms(bodyStrings[0])
-    for bodyString in bodyStrings[1:]:
+      individualMessageBodyIndex = 1
+      
+    for bodyString in bodyStrings[individualMessageBodyIndex:]:
       self.sendIndividualMessage(toNumber, bodyString)
   
   def sendIndividualMessage(self, toNumber, body):
@@ -38,23 +41,23 @@ class TwilioClient:
     self.sendMessage(toNumber, FINDING_MATCH, existingResponse)
     
   def sendPauseMessage(self, toNumber, existingResponse=None):
-    self.sendMessage(toNumber, PAUSED)
+    self.sendMessage(toNumber, PAUSED, existingResponse)
     
   def sendUnknownInstructionMessage(self, toNumber, existingResponse=None):
-    self.sendMessage(toNumber, UNKNOWN_INSTRUCTION)
+    self.sendMessage(toNumber, UNKNOWN_INSTRUCTION, existingResponse)
 
   def sendPartnerMessage(self, toNumber, body):
     self.sendMessage(toNumber, "Partner: %s" % body)
     
-  def sendNewMatchMessage(self, toNumber, matchedUser, matchedInterests):
-    matchMessage = newMessageString(matchedUser["gender"], matchedUser["college"], \
+  def sendNewMatchMessage(self, toNumber, matchedUser, matchedInterests, existingResponse=None):
+    matchMessage = newMatchString(matchedUser["gender"], matchedUser["college"], \
       matchedInterests)
-    self.sendMessage(toNumber, matchMessage)
+    self.sendMessage(toNumber, matchMessage, existingResponse)
     
   def sendPartnerEndedNewMatchMessage(self, toNumber, matchedUser, matchedInterests):
     matchMessage = partnerEndedNewMatchString(matchedUser["gender"], matchedUser["college"], \
       matchedInterests)
-    self.sendMessage(toNumber, matchMessage)
+    self.sendMessage(toNumber, matchMessage, existingResponse)
     
   def sendPartnerEndedFindingMatchMessage(self, toNumber):
     self.sendMessage(toNumber, PARTNER_ENDED_FINDING_MATCH)
