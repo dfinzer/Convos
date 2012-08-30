@@ -1,6 +1,8 @@
 import logging
 import logging.handlers
 
+# This class allows us to use TLS with SMTP in Python 2.6.
+# TODO: Deprecate come Python 2.7.
 class TlsSMTPHandler(logging.handlers.SMTPHandler):
     def emit(self, record):
         """
