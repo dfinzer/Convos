@@ -143,7 +143,7 @@ class Database():
       self.insertInterestsIfNonexistent(interests)
     
       # TODO: this is a major hack, we shouldn't be appending raw strings.
-      interestInString = "(%s)" % ",".join(map(lambda s : "'%s'" % s, interests))
+      interestInString = "(%s)" % ",".join(map(lambda s : "'%s'" % self.db.escape_string(s), interests))
       cursor.execute("""INSERT IGNORE INTO user_interest (user_id, interest_id) SELECT user.id, interest.id \
         FROM user, interest WHERE user.id = %s AND interest.name IN """ + interestInString, (userId,))
 
