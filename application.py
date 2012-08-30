@@ -52,11 +52,11 @@ def message():
   # If there's no user and the instruction is a digit, it's a verification code. So try to register the user.
   elif body.isdigit():
     if registerUser(body, phoneNumber):
-      resp.sms(WELCOME_MESSAGE)
+      textingClient.sendWelcomeMessage(phoneNumber, resp)
     else:
-      resp.sms(INCORRECT_VERIFICATION_CODE_MESSAGE)
+      textingClient.sendIncorrectVerificationCodeMessage(phoneNumber, resp)
   else:
-    resp.sms(UNKNOWN_MESSAGE)
+    textingClient.sendUnknownMessage(phoneNumber, resp)
   return str(resp)
 
 # Gets the other user id from a conversation.
@@ -109,25 +109,36 @@ def endConversationForUserAndGetNewMatchForPartner(user):
     oldMatchedUserId = getOtherUserId(conversation, user)
     db.endConversation(conversation["id"])
     
+    # Get a new match for the rejected user.
     oldMatchedUser = db.getUserFromId(oldMatchedUserId)
-    oldMatchedPhoneNumber = oldMatchedUser["phone_number"]
+    makeMatchAndNotify(oldMatchedUser, True)
+
+# Makes a new match and notifies the users. Pass true for partnerEndedMatch
+# if the user's partner ended the match.
+def makeMatchAndNotify(user, partnerEndedMatch, resp=None):
+  userPhoneNumber = user["phone_number"]
   
-    # Look for a new match for this user.
-    newMatchForOldUser = db.getMatchForUser(oldMatchedUserId)
-    
-    # If we found a match, make a new conversation and text the user.
-    if newMatchForOldUser:
-      db.insertConversation(oldMatchedUserId, newMatchForOldUser["id"])
-      
-      # Update the old user.
-      textingClient.sendMessage(oldMatchedPhoneNumber, partnerEndedNewMatchString(newMatchForOldUser["gender"], \
-        newMatchForOldUser["college"], db.getUserInterests(newMatchForOldUser["id"])))
-        
-      # Update the old user's new match.
-      textingClient.sendMessage(newMatchForOldUser["phone_number"], newMatchString(oldMatchedUser["gender"], \
-        oldMatchedUser["college"], db.getUserInterests(oldMatchedUser["id"])))
+  # Attempt to get a new match for the user.
+  newMatchedUser = db.getMatchForUser(user["id"])
+  
+  # Case: we found a new match.
+  if newMatchedUser:
+    db.insertConversation(user["id"], newMatchedUser["id"])
+    newMatchedUserInterests = db.getUserInterests(newMatchedUser["id"])
+    if partnerEndedMatch:
+      textingClient.sendPartnerEndedNewMatchMessage(userPhoneNumber, newMatchedUser, \
+        newMatchedUserInterests)
     else:
-      textingClient.sendMessage(oldMatchedPhoneNumber, PARTNER_ENDED_FINDING_MATCH)  
+      textingClient.sendNewMatchMessage(userPhoneNumber, newMatchedUser, \
+        newMatchedUserInterests)
+        
+    # Notify the matched user.
+    textingClient.sendNewMatchMessage(newMatchedUser["phone_number"], user, db.getUserInterests(user["id"]))
+  else:
+    if partnerEndedNewMatch:
+      textingClient.sendPartnerEndedFindingMatchMessage
+    else:
+      textingClient.sendFindingMatchMessage(userPhoneNumber, resp)
 
 # Handle an instruction from the user. Includes getting matches, stopping conversations, and verifying accounts.
 def handleInstruction(instruction, user, phoneNumber, resp):  
@@ -143,16 +154,8 @@ def handleInstruction(instruction, user, phoneNumber, resp):
       endConversationForUserAndGetNewMatchForPartner(user)
 
       # Get a new match for the user.
-      newMatchedUser = db.getMatchForUser(userId)
-      if newMatchedUser:
-        db.insertConversation(userId, newMatchedUser["id"])
-        resp.sms(newMatchString(newMatchedUser["gender"], newMatchedUser["college"], db.getUserInterests(newMatchedUser["id"])))
-        
-        # Notify the matched user.
-        textingClient.sendMessage(newMatchedUser["phone_number"], newMatchString(user["gender"], user["college"], db.getUserInterests(user["id"])))
-      else:
-        resp.sms(FINDING_MATCH)
-        
+      makeMatchAndNotify(user, False, resp)
+      
     # Case: the user wants to pause service.
     elif instruction == "pause":
       # End active conversations for this user.
@@ -160,11 +163,11 @@ def handleInstruction(instruction, user, phoneNumber, resp):
       
       # Pause this user.
       db.pauseUser(userId)
-      resp.sms(PAUSED)
+      textingClient.sendPauseMessage(phoneNumber, resp)
     
     # Case: unknown instruction
     else:
-      resp.sms(UNKNOWN_INSTRUCTION)
+      textingClient.sendUnknownInstructionMessage(phoneNumber, resp)
 
 # Handle an incoming message. Route the message to the appropriate user.
 def handleMessage(body, user, resp):
@@ -177,7 +180,7 @@ def handleMessage(body, user, resp):
       matchedPhoneNumber = matchedUser["phone_number"]
       
       # Send the message via text.
-      textingClient.sendMessage(matchedPhoneNumber, "Partner: " + body)
+      textingClient.sendPartnerMessage(matchedPhoneNumber, body)
       
       # Log the message in our own database.
       db.insertMessageForConversation(conversation["id"], user["id"], body)
