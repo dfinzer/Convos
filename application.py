@@ -1,11 +1,11 @@
 import argparse
-import db
 import facebook
 import json
 import random
 import twilio.twiml
 
 from constants import *
+from db import Database
 from flask import Flask, request, session
 from strings import *
 from twilioClient import TwilioClient, TwilioTestClient
@@ -18,21 +18,24 @@ app.secret_key = 'abcdefgh123456'
 parser = argparse.ArgumentParser(description='Command line options for convos server.')
 parser.add_argument('--debug', action="store_true", default=False, dest="debug")
 args = parser.parse_args()
+db = Database()
 
 # Development configuration.
 if args.debug:
-  textingClient = TwilioTestClient()
+  textingClient = TwilioTestClient(db)
   facebookAppId = PROD_FACEBOOK_ID
   facebookSecret = PROD_FACEBOOK_SECRET
 # Prod configuration.
 else:
-  textingClient = TwilioClient()
+  textingClient = TwilioClient(db)
   facebookAppId = DEBUG_FACEBOOK_ID
   facebookSecret = DEBUG_FACEBOOK_SECRET
 
 # Handles incoming text messages.
 @app.route("/message", methods=['POST'])
 def message():
+  db.openConnection()
+  
   phoneNumber = request.values.get("From")
   body = request.values.get("Body").strip()
 
@@ -60,6 +63,8 @@ def message():
       textingClient.sendIncorrectVerificationCodeMessage(phoneNumber, resp)
   else:
     textingClient.sendUnknownMessage(phoneNumber, resp)
+    
+  db.closeConnection()
   return str(resp)
 
 # Gets the other user id from a conversation.
@@ -205,6 +210,8 @@ def registerUser(verificationCode, phoneNumber):
 
 @app.route("/login", methods=['POST'])
 def login():
+  db.openConnection()
+  
   user = facebook.get_user_from_cookie(request.cookies, facebookAppId, facebookSecret)
   
   # TODO: just check the user's session uid instead of going to Facebook every time.
@@ -244,15 +251,18 @@ def login():
     session["user_id"] = existingUser["id"]
   else:
     response = {"status": "error", "error": "Not yet logged in to Facebook."}
+  db.closeConnection()
   return json.dumps(response)
 
 @app.route("/registration_status", methods=['GET'])
 def registrationStatus():
+  db.openConnection()
   if "user_id" in session:
     user = db.getUserFromId(session["user_id"])
     response = {"status": user["registration_status"]}
   else:
     response = {"status": "nonexistent"}
+  db.closeConnection()
   return json.dumps(response)
   
 if __name__ == "__main__":

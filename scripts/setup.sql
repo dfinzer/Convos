@@ -63,5 +63,6 @@ CREATE TABLE `convos`.`sms_log` (
   `phone_number` VARCHAR ( 100 ),
   `body` VARCHAR ( 500 ) NOT NULL,
   `outbound` BOOLEAN,
+  `timestamp` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (  `id` )
 ) ENGINE = MYISAM;
