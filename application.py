@@ -11,7 +11,6 @@ from strings import *
 from twilioClient import TwilioClient, TwilioTestClient
 
 app = Flask(__name__)
-app.debug = True
 app.secret_key = 'abcdefgh123456'
 
 # Parse command line options
@@ -30,6 +29,21 @@ else:
   textingClient = TwilioClient(db)
   facebookAppId = DEBUG_FACEBOOK_ID
   facebookSecret = DEBUG_FACEBOOK_SECRET
+
+  # Set up logging.
+  import logging
+  from logging.handlers import SMTPHandler
+  
+  fileHandler = logging.FileHandler('/var/tmp/convos.log')
+  fileHandler.setLevel(logging.WARNING)
+  app.logger.addHandler(fileHandler)
+  
+  # Set up email.
+  ADMINS = ['dfinzer2@gmail.com.com']
+  mail_handler = SMTPHandler('127.0.0.1', 'dfinzer2@gmail.com',
+    ADMINS, 'Convos Failed')
+  mail_handler.setLevel(logging.ERROR)
+  app.logger.addHandler(mail_handler)
 
 # Gets the other user id from a conversation.
 def getOtherUserId(conversation, user):

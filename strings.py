@@ -1,8 +1,8 @@
 import re
 
 # String constants.
-WELCOME_MESSAGE = "Welcome to Convos. To start a new conversation text #new. Text \
-  #new at any time to end your current conversation and start a new one."
+WELCOME_MESSAGE = "Welcome to Convos. To start a new convo text #new. Text \
+  #new at any time to end your current conversation and start a new one, or text #pause to take a break."
 INCORRECT_VERIFICATION_CODE_MESSAGE = "That verification code doesn't match our records. \
   Make sure you entered the verification code correctly."
 
