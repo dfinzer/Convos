@@ -155,7 +155,7 @@ class Database():
     cursor = self.db.cursor()
     cursor.execute("""SELECT interest.name FROM user_interest, interest \
       WHERE user_interest.user_id = %s AND interest.id = user_interest.interest_id""", (userId))
-    interests = interestResultToList(cursor.fetchall())
+    interests = self.interestResultToList(cursor.fetchall())
     return interests
 
   def getCommonInterests(self, userOneId, userTwoId):
@@ -164,7 +164,7 @@ class Database():
       WHERE user_interest.user_id = %s AND interest.id = user_interest.interest_id
       AND interest.id IN (SELECT interest_id FROM user_interest WHERE user_id = %s)""",
       (userOneId, userTwoId))
-    interests = interestResultToList(cursor.fetchall())
+    interests = self.interestResultToList(cursor.fetchall())
     return interests
 
   ## Conversations:
