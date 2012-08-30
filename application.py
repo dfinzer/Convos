@@ -173,7 +173,7 @@ def registerUser(verificationCode, phoneNumber):
     return False
 
 # Handles incoming text messages.
-@app.route("/message", methods=['POST'])
+@app.route("/api/message", methods=['POST'])
 def message():
   db.openConnection()
 
@@ -208,7 +208,7 @@ def message():
   db.closeConnection()
   return str(resp)
 
-@app.route("/login", methods=['POST'])
+@app.route("/api/login", methods=['POST'])
 def login():
   db.openConnection()
   
@@ -254,7 +254,7 @@ def login():
   db.closeConnection()
   return json.dumps(response)
 
-@app.route("/registration_status", methods=['GET'])
+@app.route("/api/registration_status", methods=['GET'])
 def registrationStatus():
   db.openConnection()
   if "user_id" in session:

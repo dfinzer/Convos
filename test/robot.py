@@ -20,7 +20,7 @@ else:
   app = Flask(__name__)
 
   # Receive messages.
-  @app.route("/message", methods=['POST'])
+  @app.route("/api/message", methods=['POST'])
   def receiveMessage():
     print "Received {" + request.values.get("Body") + "}"
     return "Received message"

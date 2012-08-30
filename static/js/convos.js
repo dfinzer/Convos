@@ -4,7 +4,7 @@ var pollingIntervalId;
 function login() {
   $("#loader").show();
   $("#fb-login").hide();
-  $.post("/login", {}, function(response) {
+  $.post("/api/login", {}, function(response) {
     data = $.parseJSON(response);
     if (data.status == "pending") {
       $("#verification-code").text(data.verification_code)
@@ -37,7 +37,7 @@ function showGetStartedBox() {
 }
 
 function pollRegistrationStatus() {
-  $.get("/registration_status", {}, function(response) {
+  $.get("/api/registration_status", {}, function(response) {
     data = $.parseJSON(response);
     if (data.status == "registered") {
       showGetStartedBox();
