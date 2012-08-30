@@ -1,8 +1,8 @@
 import re
 
 # String constants.
-WELCOME_MESSAGE = "Welcome to Convos. To start a new conversation text #new. \
-  Text #new at any time to end your current conversation and start a new one."
+WELCOME_MESSAGE = "Welcome to Convos. To start a new conversation text #new. Text \
+  #new at any time to end your current conversation and start a new one."
 INCORRECT_VERIFICATION_CODE_MESSAGE = "That verification code doesn't match our records. \
   Make sure you entered the verification code correctly."
 
@@ -22,6 +22,9 @@ UNKNOWN_INSTRUCTION = "Convos doesn't recognize this instruction. Valid instruct
 UNKNOWN_MESSAGE = "Convos doesn't recognize this phone number. Please check that you entered the correct four-digit verification code."
 
 PHONE_NUMBER_ALREADY_REGISTERED = "This phone number is already registered with Convos. Please use a different phone number."
+
+NO_CONVERSATION_UNPAUSE = "Convos is paused. Text #new to unpause."
+NO_CONVERSATION = "You aren't in a conversation with anyone at the moment. We'll text you when we find someone. Hold tight!"
 
 # Other constants.
 SMS_MAX_LENGTH = 160
@@ -86,21 +89,25 @@ def arrayOfAppropriateLengthStringsFromString(string):
 def abbreviatedCollegeString(college):
   college = college.replace(" University", "")
   college = college.replace(" College", "")
-  college = college.replace(", ", "'")
+  college = college.replace(", ", " '")
+  college = college.replace("20", "")
   return college
 
 # Generates a "new match" string given the available data.
-def newMatchString(gender, college, interests, newMatchMessage=NEW_MATCH):
+def newMatchString(gender, college, interests, commonInterests, newMatchMessage=NEW_MATCH):
   newPartnerString = NEW_MATCH
   if gender:
-    newPartnerString += gender + ", "
+    newPartnerString += gender
   if college:
-    newPartnerString += "from " + abbreviatedCollegeString(college)
-  if len(interests) > 0:
+    newPartnerString += ", from " + abbreviatedCollegeString(college)
+  if len(commonInterests) > 0:
+    newPartnerString += " with common interests in "
+    newPartnerString += ", ".join(commonInterests[:3])
+  elif len(interests) > 0:
     newPartnerString += " with interests in "
     newPartnerString += ", ".join(interests[:3])
   newPartnerString += (". " + SAY_HI)
   return newPartnerString
 
-def partnerEndedNewMatchString(gender, college, interests):
-  return PARTNER_ENDED_NEW_MATCH + newMatchString(gender, college, interests, PARTNER_ENDED_NEW_MATCH)
+def partnerEndedNewMatchString(gender, college, interests, commonInterests):
+  return PARTNER_ENDED_NEW_MATCH + newMatchString(gender, college, interests, commonInterests, PARTNER_ENDED_NEW_MATCH)

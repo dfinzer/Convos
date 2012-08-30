@@ -120,6 +120,11 @@ def unpauseUser(userId):
   cursor.execute("""UPDATE user SET paused = 0 WHERE id = %s""", (userId))
   cursor.close()
 
+def userIsPaused(userId):
+  cursor = db.cursor()
+  cursor.execute("""SELECT paused FROM user WHERE id = %s""", (userId))
+  return cursor.fetchone()["paused"]
+
 ## Interests:
 def insertInterestsIfNonexistent(interests):
   cursor = db.cursor()
@@ -146,7 +151,7 @@ def getUserInterests(userId):
   interests = interestResultToList(cursor.fetchall())
   return interests
 
-def getSharedInterests(userOneId, userTwoId):
+def getCommonInterests(userOneId, userTwoId):
   cursor = db.cursor()
   cursor.execute("""SELECT interest.name FROM user_interest, interest \
     WHERE user_interest.user_id = %s AND interest.id = user_interest.interest_id

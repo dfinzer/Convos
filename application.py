@@ -124,15 +124,16 @@ def makeMatchAndNotify(user, partnerEndedMatch, resp=None):
   if newMatchedUser:
     db.insertConversation(user["id"], newMatchedUser["id"])
     newMatchedUserInterests = db.getUserInterests(newMatchedUser["id"])
+    commonInterests = db.getCommonInterests(user["id"], newMatchedUser["id"])
     if partnerEndedMatch:
       textingClient.sendPartnerEndedNewMatchMessage(userPhoneNumber, newMatchedUser, \
-        newMatchedUserInterests)
+        newMatchedUserInterests, commonInterests)
     else:
       textingClient.sendNewMatchMessage(userPhoneNumber, newMatchedUser, \
-        newMatchedUserInterests, resp)
+        newMatchedUserInterests, commonInterests, resp)
         
     # Notify the matched user.
-    textingClient.sendNewMatchMessage(newMatchedUser["phone_number"], user, db.getUserInterests(user["id"]))
+    textingClient.sendNewMatchMessage(newMatchedUser["phone_number"], user, db.getUserInterests(user["id"]), commonInterests)
   else:
     if partnerEndedMatch:
       textingClient.sendPartnerEndedFindingMatchMessage(userPhoneNumber)
@@ -170,19 +171,23 @@ def handleInstruction(instruction, user, phoneNumber, resp):
 
 # Handle an incoming message. Route the message to the appropriate user.
 def handleMessage(body, user, resp):
-  if user:
-    conversation = db.getCurrentConversationForUser(user["id"])
-    if conversation:
-      # Get the matched user.
-      matchedUserId = getOtherUserId(conversation, user)
-      matchedUser = db.getUserFromId(matchedUserId)
-      matchedPhoneNumber = matchedUser["phone_number"]
-      
-      # Send the message via text.
-      textingClient.sendPartnerMessage(matchedPhoneNumber, body)
-      
-      # Log the message in our own database.
-      db.insertMessageForConversation(conversation["id"], user["id"], body)
+  conversation = db.getCurrentConversationForUser(user["id"])
+  if conversation:
+    # Get the matched user.
+    matchedUserId = getOtherUserId(conversation, user)
+    matchedUser = db.getUserFromId(matchedUserId)
+    matchedPhoneNumber = matchedUser["phone_number"]
+    
+    # Send the message via text.
+    textingClient.sendPartnerMessage(matchedPhoneNumber, body)
+    
+    # Log the message in our own database.
+    db.insertMessageForConversation(conversation["id"], user["id"], body)
+  else:
+    if db.userIsPaused(user["id"]):
+      textingClient.sendNoConversationUnpauseMessage(user["phone_number"])
+    else:
+      textingClient.sendNoConversationMessage(user["phone_number"])
 
 # Attempts to register an existing user with the specified verification code.
 # Returns whether we were successful.

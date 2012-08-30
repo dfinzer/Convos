@@ -49,18 +49,24 @@ class TwilioClient:
   def sendPartnerMessage(self, toNumber, body):
     self.sendMessage(toNumber, "Partner: %s" % body)
     
-  def sendNewMatchMessage(self, toNumber, matchedUser, matchedInterests, existingResponse=None):
+  def sendNewMatchMessage(self, toNumber, matchedUser, matchedInterests, commonInterests, existingResponse=None):
     matchMessage = newMatchString(matchedUser["gender"], matchedUser["college"], \
-      matchedInterests)
+      matchedInterests, commonInterests)
     self.sendMessage(toNumber, matchMessage, existingResponse)
     
-  def sendPartnerEndedNewMatchMessage(self, toNumber, matchedUser, matchedInterests):
+  def sendPartnerEndedNewMatchMessage(self, toNumber, matchedUser, matchedInterests, commonInterests):
     matchMessage = partnerEndedNewMatchString(matchedUser["gender"], matchedUser["college"], \
-      matchedInterests)
-    self.sendMessage(toNumber, matchMessage, existingResponse)
+      matchedInterests, commonInterests)
+    self.sendMessage(toNumber, matchMessage)
     
   def sendPartnerEndedFindingMatchMessage(self, toNumber):
     self.sendMessage(toNumber, PARTNER_ENDED_FINDING_MATCH)
+    
+  def sendNoConversationUnpauseMessage(self, toNumber, existingResponse=None):
+    self.sendMessage(toNumber, NO_CONVERSATION_UNPAUSE)
+    
+  def sendNoConversationMessage(self, toNumber, existingResponse=None):
+    self.sendMessage(toNumber, NO_CONVERSATION)
     
 class TwilioTestClient(TwilioClient):
   def sendIndividualMessage(self, toNumber, body):
