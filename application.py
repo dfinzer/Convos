@@ -41,8 +41,8 @@ else:
   # Set up email.
   from smtp import TlsSMTPHandler
   ADMINS = ['dfinzer2@gmail.com']
-  mail_handler = TlsSMTPHandler('email-smtp.us-east-1.amazonaws.com', 'dfinzer2@gmail.com', ADMINS, 'Convos Failed', credentials=('AKIAJVZYBPD2LLMWMDAA', 'Alwl4cvm2242mRq5r9h/2PgAfZ8FHJLTeAqTBO+R8CZP'))
-  mail_handler.setLevel(logging.ERROR)
+  mail_handler = TlsSMTPHandler(('email-smtp.us-east-1.amazonaws.com', 25), 'dfinzer2@gmail.com', ADMINS, 'Convos Failed', credentials=('AKIAJVZYBPD2LLMWMDAA', 'Alwl4cvm2242mRq5r9h/2PgAfZ8FHJLTeAqTBO+R8CZP'))
+  mail_handler.setLevel(logging.WARNING)
   app.logger.addHandler(mail_handler)
 
 # Gets the other user id from a conversation.
