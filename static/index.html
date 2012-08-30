@@ -9,58 +9,69 @@
     <br/>
     <div class="container">
       <div class="hero-unit">
-        <h1>Welcome to Convos</h1>
-        <h2>Make new friends over text!</h2>
-        <p>
-          Convos is a text roulette app that pairs you up with other Brown students based on common interests.
-          It's all through texting, so you don't even need to install an app! And we'll never share your phone number or post on your wall!
-        </p>
-        
-        <!-- Loading box -->
-        <div id="loader">
-          <img src="images/ajax-loader.gif"></img>
-          <br/>
-          Generating verification code...
-        </div>
-        
-        <!-- Verification code box -->
-        <div id="verification-code-box" class="well">
+        <div id="home" class="page current-page">
+          <h1>Welcome to Convos</h1>
+          <h2>Make new friends over text!</h2>
           <p>
-          You're almost there! Just text <b><span id="verification-code"></span></b>
-          to <b>(925) 272-0008</b> to get started. Don't worry, no one will ever see your phone number.
+            Convos is a text roulette app that pairs you up with other Brown students based on common interests.
+            It's all through texting, so you don't even need to install an app! And we'll never share your phone number or post on your wall!
           </p>
-          <a class="btn">Having trouble? Click here for help.</a>
-        </div>
+        
+          <!-- Loading box -->
+          <div id="loader">
+            <img src="images/ajax-loader.gif"></img>
+            <br/>
+            Generating verification code...
+          </div>
+        
+          <!-- Verification code box -->
+          <div id="verification-code-box" class="well">
+            <p>
+            You're almost there! Just text <b><span id="verification-code"></span></b>
+            to <b>(925) 272-0008</b> to get started. Don't worry, no one will ever see your phone number.
+            </p>
+            <a class="btn">Having trouble? Click here for help.</a>
+          </div>
 
-        <!-- Getting started box -->
-        <div id="get-started-box" class="well">
-          You're all set up! To get started, just text <b>#new</b> to <b>(925) 272-0008</b> and we'll match you up! Or if you ever want to take a break,
-          just text #pause and we'll stop matching you with new people.
-        </div>
+          <!-- Getting started box -->
+          <div id="get-started-box" class="well">
+            You're all set up! To get started, just text <b>#new</b> to <b>(925) 272-0008</b> and we'll match you up! Or if you ever want to take a break,
+            just text #pause and we'll stop matching you with new people.
+          </div>
         
-        <!-- Facebook login button -->
-        <a id="fb-login" class="btn btn-primary btn-large">
-          Login With Facebook
-        </a>
-        
-        <!-- Error box -->
-        <div id="error-box" class="well">
-          An unexpected error occurred. Please refresh your browser and try again. Sorry!
-        </div>
-        
-        <!-- Feedback box -->
-        <div id="feedback-box" class="well">
+          <!-- Facebook login button -->
+          <a id="fb-login" class="btn btn-primary btn-large">
+            Login With Facebook
+          </a>
           
+          <!-- Error box -->
+          <div id="error-box" class="well">
+            An unexpected error occurred. Please refresh your browser and try again. Sorry!
+          </div>
+        </div>
+                
+        <!-- Feedback box -->
+        <div id="feedback" class="page">
+          <h1>Feedback</h1>
         </div>
         
         <!-- Help box -->
-        <div id="help-box" class="well">
+        <div id="help" class="page">
+          <h1>Help</h1>
           
         </div>
         
         <!-- Contact us box -->
-        <div id="contact", class="well">
+        <div id="contact", class="page">
+          <h1>Contact</h1>
         
+        </div>
+        <br/><br/>
+        <div>
+          <a href="javascript:switchPage('home')">Home</a> |
+          <a href="javascript:switchPage('feedback')">Feedback</a> |
+          <a href="javascript:switchPage('help')">Help</a> |
+          <a href="javascript:switchPage('contact')">Contact</a>
         </div>
       </div>
     </div>

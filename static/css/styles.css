@@ -1,9 +1,15 @@
+.page {
+  display: none;
+}
+
+.current-page {
+  display: inline;
+}
+
 #verification-code-box,
 #loader,
 #get-started-box,
-#error-box,
-#feedback-box,
-#help-box,
-#contact {
+#error-box
+{
   display: none;
 }

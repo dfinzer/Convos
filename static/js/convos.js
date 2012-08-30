@@ -47,3 +47,13 @@ function pollRegistrationStatus() {
     clearInterval(pollingIntervalId)
   });
 }
+
+function switchPage(pageId) {
+  // Find visible page.
+  $(".page.current-page").hide("slow", function() {
+    $(this).removeClass("current-page");
+    $("#" + pageId).show("slow", function() {
+      $("#" + pageId).addClass("current-page");
+    });
+  });
+}
