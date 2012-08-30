@@ -41,7 +41,7 @@ else:
   # Set up email.
   ADMINS = ['dfinzer2@gmail.com.com']
   mail_handler = SMTPHandler('127.0.0.1', 'dfinzer2@gmail.com',
-    ADMINS, 'Convos Failed')
+    ADMINS, 'Convos Failed', credentials=('AKIAJVZYBPD2LLMWMDAA', 'Alwl4cvm2242mRq5r9h/2PgAfZ8FHJLTeAqTBO+R8CZP'), secure=())
   mail_handler.setLevel(logging.ERROR)
   app.logger.addHandler(mail_handler)
 
