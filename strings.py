@@ -103,4 +103,4 @@ def newMatchString(gender, college, interests, newMatchMessage=NEW_MATCH):
   return newPartnerString
 
 def partnerEndedNewMatchString(gender, college, interests):
-  return partnerEndedNewMatchString + newMatchString(gender, college, interests, PARTNER_ENDED_NEW_MATCH)
+  return PARTNER_ENDED_NEW_MATCH + newMatchString(gender, college, interests, PARTNER_ENDED_NEW_MATCH)
