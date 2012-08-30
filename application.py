@@ -31,42 +31,6 @@ else:
   facebookAppId = DEBUG_FACEBOOK_ID
   facebookSecret = DEBUG_FACEBOOK_SECRET
 
-# Handles incoming text messages.
-@app.route("/message", methods=['POST'])
-def message():
-  db.openConnection()
-  
-  phoneNumber = request.values.get("From")
-  body = request.values.get("Body").strip()
-
-  # Log the message.
-  db.logMessage(phoneNumber, body, False)
-
-  # Check if a user for this phone number exists in the database.
-  user = db.getUserFromPhoneNumber(phoneNumber)
-  
-  # Initialize an appropriate twilio response.
-  resp = twilio.twiml.Response()
-  
-  # Check if this is an instruction.
-  if user:
-    if body.startswith("#"):
-      handleInstruction(body[1:], user, phoneNumber, resp)
-    # Otherwise, we need to route this message.
-    else:
-      handleMessage(body, user, resp)
-  # If there's no user and the instruction is a digit, it's a verification code. So try to register the user.
-  elif body.isdigit():
-    if registerUser(body, phoneNumber):
-      textingClient.sendWelcomeMessage(phoneNumber, resp)
-    else:
-      textingClient.sendIncorrectVerificationCodeMessage(phoneNumber, resp)
-  else:
-    textingClient.sendUnknownMessage(phoneNumber, resp)
-    
-  db.closeConnection()
-  return str(resp)
-
 # Gets the other user id from a conversation.
 def getOtherUserId(conversation, user):
   return conversation["user_two_id"] if conversation["user_one_id"] == user["id"]  \
@@ -207,6 +171,42 @@ def registerUser(verificationCode, phoneNumber):
     return True
   else:
     return False
+
+# Handles incoming text messages.
+@app.route("/message", methods=['POST'])
+def message():
+  db.openConnection()
+
+  phoneNumber = request.values.get("From")
+  body = request.values.get("Body").strip()
+
+  # Log the message.
+  db.logMessage(phoneNumber, body, False)
+
+  # Check if a user for this phone number exists in the database.
+  user = db.getUserFromPhoneNumber(phoneNumber)
+
+  # Initialize an appropriate twilio response.
+  resp = twilio.twiml.Response()
+
+  # Check if this is an instruction.
+  if user:
+    if body.startswith("#"):
+      handleInstruction(body[1:], user, phoneNumber, resp)
+    # Otherwise, we need to route this message.
+    else:
+      handleMessage(body, user, resp)
+  # If there's no user and the instruction is a digit, it's a verification code. So try to register the user.
+  elif body.isdigit():
+    if registerUser(body, phoneNumber):
+      textingClient.sendWelcomeMessage(phoneNumber, resp)
+    else:
+      textingClient.sendIncorrectVerificationCodeMessage(phoneNumber, resp)
+  else:
+    textingClient.sendUnknownMessage(phoneNumber, resp)
+
+  db.closeConnection()
+  return str(resp)
 
 @app.route("/login", methods=['POST'])
 def login():
