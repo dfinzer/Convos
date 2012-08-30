@@ -208,3 +208,9 @@ def insertMessageForConversation(conversationId, fromUserId, body):
   cursor = db.cursor()
   cursor.execute("""INSERT INTO message (conversation_id, from_user_id, body) VALUES (%s, %s, %s)""", (conversationId, fromUserId, body))
   cursor.close()
+  
+## Logging:
+def logMessage(phoneNumber, body, outbound):
+  cursor = db.cursor()
+  cursor.execute("""INSERT INTO sms_log (phone_number, body, outbound) VALUES (%s, %s, %s)""", (phoneNumber, body, outbound))
+  cursor.close()

@@ -33,8 +33,11 @@ else:
 # Handles incoming text messages.
 @app.route("/message", methods=['POST'])
 def message():
-  body = request.values.get("Body").strip()
   phoneNumber = request.values.get("From")
+  body = request.values.get("Body").strip()
+
+  # Log the message.
+  db.logMessage(phoneNumber, body, False)
 
   # Check if a user for this phone number exists in the database.
   user = db.getUserFromPhoneNumber(phoneNumber)

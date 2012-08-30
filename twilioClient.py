@@ -1,3 +1,4 @@
+import db
 import twilio.twiml
 
 from strings import *
@@ -12,18 +13,34 @@ TWILIO_PHONE_NUMBER = "+19252720008"
 client = TwilioRestClient(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
 class TwilioClient:
+  # Sends a message in one of two ways: 1. via the Twilio REST API. 2. By modifying the
+  # server's response to Twilio.
   def sendMessage(self, toNumber, body, existingResponse=None):    
     bodyStrings = arrayOfAppropriateLengthStringsFromString(body)
+    
+    # The index of the first bodyString that will be sent via the Twilio REST API.
     individualMessageBodyIndex = 0
+    
+    # If the server is crafting a twilio response, we'll use that, at least
+    # for the first part of the message.
     if existingResponse:
       existingResponse.sms(bodyStrings[0])
+      
+      # Log the message.
+      db.logMessage(toNumber, bodyStrings[0], True)
+      
+      # Since we sent that one using the response, we send the rest using the REST API.
       individualMessageBodyIndex = 1
       
     for bodyString in bodyStrings[individualMessageBodyIndex:]:
       self.sendIndividualMessage(toNumber, bodyString)
   
   def sendIndividualMessage(self, toNumber, body):
+    # Send via twilio.
     client.sms.messages.create(to=toNumber, from_=TWILIO_PHONE_NUMBER, body=body)
+    
+    # Log the message.
+    db.logMessage(toNumber, body, True)
   
   def sendWelcomeMessage(self, toNumber, existingResponse=None):
     self.sendMessage(toNumber, WELCOME_MESSAGE, existingResponse)
@@ -77,3 +94,6 @@ class TwilioTestClient(TwilioClient):
     except:
       print "Connection error sending message."
     print "Sending message to %s, body: {%s}" % (toNumber, body)
+    
+    # Log the message.
+    db.logMessage(toNumber, body, True)

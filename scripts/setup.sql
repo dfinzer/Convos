@@ -57,3 +57,11 @@ CREATE TABLE `convos`.`user_interest` (
   PRIMARY KEY (  `id` ),
   UNIQUE KEY `user_id` (`user_id`, `interest_id`)
 ) ENGINE = MYISAM;
+
+CREATE TABLE `convos`.`sms_log` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `phone_number` VARCHAR ( 100 ),
+  `body` VARCHAR ( 500 ) NOT NULL,
+  `outbound` BOOLEAN,
+  PRIMARY KEY (  `id` )
+) ENGINE = MYISAM;
