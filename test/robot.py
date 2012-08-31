@@ -23,7 +23,7 @@ else:
   # Receive messages.
   @app.route("/api/message", methods=['POST'])
   def receiveMessage():
-    print "Received {" + request.values.get("Body") + "}"
+    print "Received {" + request.values.get("Body") + "} from " + request.values.get("From")
     return "Received message"
 
   # Run on the port of the phone number.

@@ -95,7 +95,7 @@ def abbreviatedCollegeString(college):
 
 # Generates a "new match" string given the available data.
 def newMatchString(gender, college, interests, commonInterests, newMatchMessage=NEW_MATCH):
-  newPartnerString = NEW_MATCH
+  newPartnerString = newMatchMessage
   if gender:
     newPartnerString += gender
   if college:
@@ -110,4 +110,4 @@ def newMatchString(gender, college, interests, commonInterests, newMatchMessage=
   return newPartnerString
 
 def partnerEndedNewMatchString(gender, college, interests, commonInterests):
-  return PARTNER_ENDED_NEW_MATCH + newMatchString(gender, college, interests, commonInterests, PARTNER_ENDED_NEW_MATCH)
+  return newMatchString(gender, college, interests, commonInterests, PARTNER_ENDED_NEW_MATCH)

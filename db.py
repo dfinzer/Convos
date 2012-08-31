@@ -158,6 +158,12 @@ class Database():
       AND id NOT IN (SELECT user_two_twilio_number_id FROM conversation WHERE user_two_id = %s AND in_progress = 1)""",
       (userId, userId))
     return cursor.fetchone()
+    
+  def getTwilioNumbersForUser(self, user):
+    cursor = self.db.cursor()
+    cursor.execute("""SELECT twilio_number.* FROM twilio_number, user_twilio_number WHERE \
+      user_twilio_number.user_id = %s AND user_twilio_number.twilio_number_id = twilio_number.id""", (user["id"]))
+    return cursor.fetchall()
 
   ## Interests:
   def insertInterestsIfNonexistent(self, interests):

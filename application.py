@@ -120,19 +120,20 @@ def makeMatchAndNotify(user, userTwilioNumber, partnerEndedMatch, resp=None):
     newMatchedUserInterests = db.getUserInterests(newMatchedUser["id"])
     commonInterests = db.getCommonInterests(user["id"], newMatchedUser["id"])
     if partnerEndedMatch:
-      textingClient.sendPartnerEndedNewMatchMessage(userPhoneNumber, newMatchedUser, \
+      textingClient.sendPartnerEndedNewMatchMessage(userPhoneNumber, userTwilioNumber, newMatchedUser, \
         newMatchedUserInterests, commonInterests)
     else:
-      textingClient.sendNewMatchMessage(userPhoneNumber, newMatchedUser, \
+      textingClient.sendNewMatchMessage(userPhoneNumber, userTwilioNumber, newMatchedUser, \
         newMatchedUserInterests, commonInterests, resp)
         
     # Notify the matched user.
-    textingClient.sendNewMatchMessage(newMatchedUser["phone_number"], user, db.getUserInterests(user["id"]), commonInterests)
+    textingClient.sendNewMatchMessage(newMatchedUser["phone_number"], newMatchedUserTwilioNumber, user, \
+      db.getUserInterests(user["id"]), commonInterests)
   else:
     if partnerEndedMatch:
-      textingClient.sendPartnerEndedFindingMatchMessage(userPhoneNumber)
+      textingClient.sendPartnerEndedFindingMatchMessage(userPhoneNumber, userTwilioNumber)
     else:
-      textingClient.sendFindingMatchMessage(userPhoneNumber, resp)
+      textingClient.sendFindingMatchMessage(userPhoneNumber, userTwilioNumber, resp)
 
 # Handle an instruction from the user. Includes getting matches, stopping conversations, and verifying accounts.
 def handleInstruction(instruction, user, userTwilioNumber, phoneNumber, resp):  
@@ -152,12 +153,14 @@ def handleInstruction(instruction, user, userTwilioNumber, phoneNumber, resp):
       
     # Case: the user wants to pause service.
     elif instruction == "pause":
-      # End active conversations for this user.
-      endConversationForUserAndGetNewMatchForPartner(user, userTwilioNumber)
+      # End all active conversations for this user; that means we need to go through all of the user's twilio numbers
+      # and pause and active conversations.
+      for twilioNumber in db.getTwilioNumbersForUser(user):
+        endConversationForUserAndGetNewMatchForPartner(user, twilioNumber)
       
       # Pause this user.
       db.pauseUser(userId)
-      textingClient.sendPauseMessage(phoneNumber, resp)
+      textingClient.sendPauseMessage(phoneNumber, userTwilioNumber, resp)
     
     # Case: unknown instruction
     else:
@@ -171,20 +174,19 @@ def handleMessage(body, user, userTwilioNumber, resp):
     matchedUserId = getOtherUserId(conversation, user)
     matchedUserTwilioNumberId = getOtherUserTwilioNumberId(conversation, user)
     matchedUser = db.getUserFromId(matchedUserId)
-    # TODO: use this variable.
     matchedUserTwilioNumber = db.getTwilioNumberFromId(matchedUserTwilioNumberId)
     matchedPhoneNumber = matchedUser["phone_number"]
     
     # Send the message via text.
-    textingClient.sendPartnerMessage(matchedPhoneNumber, body)
+    textingClient.sendPartnerMessage(matchedPhoneNumber, matchedUserTwilioNumber, body)
     
     # Log the message in our own database.
     db.insertMessageForConversation(conversation["id"], user["id"], body)
   else:
     if db.userIsPaused(user["id"]):
-      textingClient.sendNoConversationUnpauseMessage(user["phone_number"])
+      textingClient.sendNoConversationUnpauseMessage(user["phone_number"], userTwilioNumber)
     else:
-      textingClient.sendNoConversationMessage(user["phone_number"])
+      textingClient.sendNoConversationMessage(user["phone_number"], userTwilioNumber)
 
 # Attempts to register an existing user with the specified verification code.
 # Returns whether we were successful.
@@ -234,11 +236,11 @@ def message():
   # If there's no user and the instruction is a digit, it's a verification code. So try to register the user.
   elif body.isdigit():
     if registerUser(body, phoneNumber, twilioNumber):
-      textingClient.sendWelcomeMessage(phoneNumber, resp)
+      textingClient.sendWelcomeMessage(phoneNumber, twilioNumber, resp)
     else:
-      textingClient.sendIncorrectVerificationCodeMessage(phoneNumber, resp)
+      textingClient.sendIncorrectVerificationCodeMessage(phoneNumber, twilioNumber, resp)
   else:
-    textingClient.sendUnknownMessage(phoneNumber, resp)
+    textingClient.sendUnknownMessage(phoneNumber, twilioNumber, resp)
 
   db.closeConnection()
   return str(resp)
