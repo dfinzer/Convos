@@ -10,12 +10,13 @@ parser.add_argument('--port', type=int, default=10080)
 parser.add_argument('--number', type=int, default=8000)
 parser.add_argument('--body', type=str, default="Test message")
 parser.add_argument('--send', type=bool, default=False)
+parser.add_argument('--to', type=str, default="+19254021697")
 args = parser.parse_args()
 
 if args.send:
   # Send a message.
   print "Sending message '%s' from %s" % (args.body, args.number)
-  print "Received " + sendMessage(args.host, args.port, args.number, args.body)
+  print "Received " + sendMessage(args.host, args.port, args.number, args.body, args.to)
 else:
   app = Flask(__name__)
 

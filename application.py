@@ -193,7 +193,13 @@ def message():
   db.openConnection()
 
   phoneNumber = request.values.get("From")
-  twilioNumber = request.values.get("To")
+  twilioNumber = db.getTwilioNumberFromNumber(request.values.get("To"))
+  
+  # Check that we have a twilio number.
+  if not twilioNumber:
+    return json.dumps({"status": "error", "error": "Convos doesn't recognize this twilio number."})
+  twilioNumberId = twilioNumber["id"]
+  
   body = request.values.get("Body").strip()
 
   # Log the message.
@@ -207,6 +213,9 @@ def message():
 
   # Check if this is an instruction.
   if user:
+    # Register the user with this twilio user if he's not already registered (no matter what he sent.)
+    db.addTwilioNumberForUserIfNonexistent(user, twilioNumber)
+    
     if body.startswith("#"):
       handleInstruction(body[1:], user, phoneNumber, resp)
     # Otherwise, we need to route this message.

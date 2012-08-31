@@ -33,6 +33,8 @@ CREATE TABLE `convos`.`twilio_number` (
   PRIMARY KEY (  `id` )
 ) ENGINE = MYISAM;
 
+INSERT INTO `twilio_number` (number) VALUES ("+19254021697"), ("+19252720008");
+
 # Maps users to twilio numbers with which they are registered.
 CREATE TABLE `convos`.`user_twilio_number`(
     `id` INT NOT NULL AUTO_INCREMENT,

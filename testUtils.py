@@ -7,7 +7,7 @@ def postRequest(conn, path, params):
   response = conn.getresponse()
   return response.read()
   
-def sendMessage(host, port, phoneNumber, body):
+def sendMessage(host, port, phoneNumber, body, toNumber="0"):
   conn = httplib.HTTPConnection(host, port)
-  params = {"From": phoneNumber, "Body": body}
+  params = {"From": phoneNumber, "Body": body, "To": toNumber}
   return postRequest(conn, "/api/message", params)

@@ -114,7 +114,7 @@ class Database():
     cursor.execute("""UPDATE user SET phone_number = %s, registration_status = 'registered' WHERE id = %s""", \
       (phoneNumber, userId))
     cursor.execute("""INSERT IGNORE INTO user_twilio_number (user_id, twilio_number_id) VALUES (%s, %s)""", \
-      (userId, twilioNumber))
+      (userId, twilioNumber["id"]))
     cursor.close()
 
   # Pausing/unpausing user.
@@ -132,6 +132,18 @@ class Database():
     cursor = self.db.cursor()
     cursor.execute("""SELECT paused FROM user WHERE id = %s""", (userId))
     return cursor.fetchone()["paused"]
+
+  ## Twilio numbers.
+  def getTwilioNumberFromNumber(self, number):
+    cursor = self.db.cursor()
+    cursor.execute("""SELECT * FROM twilio_number WHERE number = %s""", (number))
+    return cursor.fetchone()
+
+  def addTwilioNumberForUserIfNonexistent(self, user, twilioNumber):
+    cursor = self.db.cursor()
+    cursor.execute("""INSERT IGNORE INTO user_twilio_number (user_id, twilio_number_id) VALUES (%s, %s)""", \
+      (user["id"], twilioNumber["id"]))
+    cursor.close()
 
   ## Interests:
   def insertInterestsIfNonexistent(self, interests):
