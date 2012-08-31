@@ -155,8 +155,9 @@ class Database():
     userId = user["id"]
     cursor.execute("""SELECT * FROM twilio_number WHERE id NOT IN \
       (SELECT user_one_twilio_number_id FROM conversation WHERE user_one_id = %s AND in_progress = 1)
-      AND id NOT IN (SELECT user_two_twilio_number_id FROM conversation WHERE user_two_id = %s AND in_progress = 1)""",
-      (userId, userId))
+      AND id NOT IN (SELECT user_two_twilio_number_id FROM conversation WHERE user_two_id = %s AND in_progress = 1)
+      AND id IN (SELECT twilio_number_id FROM user_twilio_number WHERE user_id = %s)""",
+      (userId, userId, userId))
     return cursor.fetchone()
     
   def getTwilioNumbersForUser(self, user):

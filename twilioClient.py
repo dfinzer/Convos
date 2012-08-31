@@ -90,7 +90,7 @@ class TwilioTestClient(TwilioClient):
   def sendIndividualMessage(self, toNumber, twilioNumber, body):
     try:
       # We use the port as the phone number.
-      sendMessage("localhost", toNumber, twilioNumber, body)
+      sendMessage("localhost", toNumber, twilioNumber["number"], body)
     # TODO: Handle exceptions better.
     except:
       print "Connection error sending message."
