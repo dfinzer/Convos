@@ -23,7 +23,7 @@ UNKNOWN_MESSAGE = "Convos doesn't recognize this phone number. Please check that
 
 PHONE_NUMBER_ALREADY_REGISTERED = "This phone number is already registered with Convos. Please use a different phone number."
 
-NO_CONVERSATION_UNPAUSE = "Convos is paused. Text #new to unpause."
+NO_CONVERSATION_UNPAUSE = "Convos is paused. Text #new to unpause and start a new convo."
 NO_CONVERSATION = "You aren't in a conversation with anyone at the moment. We'll text you when we find someone. Hold tight!"
 
 # Other constants.
