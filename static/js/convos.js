@@ -30,7 +30,7 @@ function login() {
       
       // Poll for the user's registration status, so we can auto-update the page.
       if (!hasSetPollingInterval) {
-        pollingIntervalId = setInterval(pollRegistrationStatus, 1000);
+        pollingIntervalId = setInterval(pollRegistrationStatus, 2000);
         hasSetPollingInterval = true;
       }
     } else if (data.status == "registered") {
