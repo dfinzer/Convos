@@ -259,10 +259,10 @@ class Database():
   def requestDataTuple(self, data):
     return (getValueOrNull(data, "ip"), getValueOrNull(data, "user_agent"), getValueOrAlt(data, "user_id", 0))
   
-  def logMessage(self, phoneNumber, body, outbound):
+  def logMessage(self, phoneNumber, twilioNumber, body, outbound):
     cursor = self.db.cursor()
-    cursor.execute("""INSERT INTO sms_log (phone_number, body, outbound) VALUES (%s, %s, %s)""", \
-      (phoneNumber, body, outbound))
+    cursor.execute("""INSERT INTO sms_log (phone_number, twilio_number_id, body, outbound) VALUES (%s, %s, %s, %s)""", \
+      (phoneNumber, twilioNumber["id"], body, outbound))
     cursor.close()
     
   def logClickedFacebookLogin(self, data):

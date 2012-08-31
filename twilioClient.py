@@ -28,7 +28,7 @@ class TwilioClient:
       existingResponse.sms(bodyStrings[0])
       
       # Log the message.
-      self.db.logMessage(toNumber, bodyStrings[0], True)
+      self.db.logMessage(toNumber, twilioNumber, bodyStrings[0], True)
       
       # Since we sent that one using the response, we send the rest using the REST API.
       individualMessageBodyIndex = 1
@@ -41,7 +41,7 @@ class TwilioClient:
     client.sms.messages.create(to=toNumber, from_=twilioNumber["number"], body=body)
     
     # Log the message.
-    self.db.logMessage(toNumber, body, True)
+    self.db.logMessage(toNumber, twilioNumber, body, True)
   
   def sendWelcomeMessage(self, toNumber, twilioNumber, existingResponse=None):
     self.sendMessage(toNumber, twilioNumber, WELCOME_MESSAGE, existingResponse)
@@ -97,4 +97,4 @@ class TwilioTestClient(TwilioClient):
     print "Sending message to %s, body: {%s}, from %s" % (toNumber, body, twilioNumber["number"])
     
     # Log the message.
-    self.db.logMessage(toNumber, body, True)
+    self.db.logMessage(toNumber, twilioNumber, body, True)

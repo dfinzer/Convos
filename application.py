@@ -210,12 +210,11 @@ def message():
   # Check that we have a twilio number.
   if not twilioNumber:
     return json.dumps({"status": "error", "error": "Convos doesn't recognize this twilio number."})
-  twilioNumberId = twilioNumber["id"]
   
   body = request.values.get("Body").strip()
 
   # Log the message.
-  db.logMessage(phoneNumber, body, False)
+  db.logMessage(phoneNumber, twilioNumber, body, False)
 
   # Check if a user for this phone number exists in the database.
   user = db.getUserFromPhoneNumber(phoneNumber)

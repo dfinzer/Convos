@@ -80,6 +80,7 @@ CREATE TABLE `convos`.`user_interest` (
 CREATE TABLE `convos`.`sms_log` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `phone_number` VARCHAR ( 100 ),
+  `twilio_number_id` INT NOT NULL,
   `body` VARCHAR ( 500 ) NOT NULL,
   `outbound` BOOLEAN,
   `timestamp` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
