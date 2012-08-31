@@ -51,6 +51,10 @@ def getOtherUserId(conversation, user):
   return conversation["user_two_id"] if conversation["user_one_id"] == user["id"]  \
     else conversation["user_one_id"]
 
+def getOtherUserTwilioNumberId(conversation, user):
+  return conversation["user_two_twilio_number_id"] if conversation["user_one_id"] == user["id"] \
+    else conversation["user_one_twilio_number_id"]
+
 # Generates an array of interests (strings) from a more complex array of Facebook data.
 def interestArrayFromFacebookLikeData(facebookLikeData):
   interests = []
@@ -89,27 +93,30 @@ def findMostRecentCollegeFromFacebookData(facebookData):
   return None
 
 # Ends the specified conversation and gets a new match for the rejected partner.
-def endConversationForUserAndGetNewMatchForPartner(user):
-  conversation = db.getCurrentConversationForUser(user["id"])
+def endConversationForUserAndGetNewMatchForPartner(user, userTwilioNumber):
+  conversation = db.getCurrentConversationForUser(user["id"], userTwilioNumber)
   if conversation:
-    oldMatchedUserId = getOtherUserId(conversation, user)
     db.endConversation(conversation["id"])
     
     # Get a new match for the rejected user.
+    oldMatchedUserId = getOtherUserId(conversation, user)
     oldMatchedUser = db.getUserFromId(oldMatchedUserId)
-    makeMatchAndNotify(oldMatchedUser, True)
+    oldMatchedUserTwilioNumberId = getOtherUserTwilioNumberId(conversation, user)
+    oldMatchedUserTwilioNumber = db.getTwilioNumberFromId(oldMatchedUserTwilioNumberId)
+    makeMatchAndNotify(oldMatchedUser, oldMatchedUserTwilioNumber, True)
 
 # Makes a new match and notifies the users. Pass true for partnerEndedMatch
 # if the user's partner ended the match.
-def makeMatchAndNotify(user, partnerEndedMatch, resp=None):
+def makeMatchAndNotify(user, userTwilioNumber, partnerEndedMatch, resp=None):
   userPhoneNumber = user["phone_number"]
   
   # Attempt to get a new match for the user.
   newMatchedUser = db.getMatchForUser(user["id"])
+  newMatchedUserTwilioNumber = db.getAvailableTwilioNumberForUser(user)
   
   # Case: we found a new match.
   if newMatchedUser:
-    db.insertConversation(user["id"], newMatchedUser["id"])
+    db.insertConversation(user["id"], userTwilioNumber, newMatchedUser["id"], newMatchedUserTwilioNumber)
     newMatchedUserInterests = db.getUserInterests(newMatchedUser["id"])
     commonInterests = db.getCommonInterests(user["id"], newMatchedUser["id"])
     if partnerEndedMatch:
@@ -128,7 +135,7 @@ def makeMatchAndNotify(user, partnerEndedMatch, resp=None):
       textingClient.sendFindingMatchMessage(userPhoneNumber, resp)
 
 # Handle an instruction from the user. Includes getting matches, stopping conversations, and verifying accounts.
-def handleInstruction(instruction, user, phoneNumber, resp):  
+def handleInstruction(instruction, user, userTwilioNumber, phoneNumber, resp):  
   # If there's a user, handle the instruction.
   if user:
     userId = user["id"]
@@ -138,15 +145,15 @@ def handleInstruction(instruction, user, phoneNumber, resp):
       db.unpauseUser(userId)
       
       # If the user is currently in a conversation, end it.
-      endConversationForUserAndGetNewMatchForPartner(user)
+      endConversationForUserAndGetNewMatchForPartner(user, userTwilioNumber)
 
       # Get a new match for the user.
-      makeMatchAndNotify(user, False, resp)
+      makeMatchAndNotify(user, userTwilioNumber, False, resp)
       
     # Case: the user wants to pause service.
     elif instruction == "pause":
       # End active conversations for this user.
-      endConversationForUserAndGetNewMatchForPartner(user)
+      endConversationForUserAndGetNewMatchForPartner(user, userTwilioNumber)
       
       # Pause this user.
       db.pauseUser(userId)
@@ -157,12 +164,15 @@ def handleInstruction(instruction, user, phoneNumber, resp):
       textingClient.sendUnknownInstructionMessage(phoneNumber, resp)
 
 # Handle an incoming message. Route the message to the appropriate user.
-def handleMessage(body, user, resp):
-  conversation = db.getCurrentConversationForUser(user["id"])
+def handleMessage(body, user, userTwilioNumber, resp):
+  conversation = db.getCurrentConversationForUser(user["id"], userTwilioNumber)
   if conversation:
     # Get the matched user.
     matchedUserId = getOtherUserId(conversation, user)
+    matchedUserTwilioNumberId = getOtherUserTwilioNumberId(conversation, user)
     matchedUser = db.getUserFromId(matchedUserId)
+    # TODO: use this variable.
+    matchedUserTwilioNumber = db.getTwilioNumberFromId(matchedUserTwilioNumberId)
     matchedPhoneNumber = matchedUser["phone_number"]
     
     # Send the message via text.
@@ -217,10 +227,10 @@ def message():
     db.addTwilioNumberForUserIfNonexistent(user, twilioNumber)
     
     if body.startswith("#"):
-      handleInstruction(body[1:], user, phoneNumber, resp)
+      handleInstruction(body[1:], user, twilioNumber, phoneNumber, resp)
     # Otherwise, we need to route this message.
     else:
-      handleMessage(body, user, resp)
+      handleMessage(body, user, twilioNumber, resp)
   # If there's no user and the instruction is a digit, it's a verification code. So try to register the user.
   elif body.isdigit():
     if registerUser(body, phoneNumber, twilioNumber):

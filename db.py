@@ -139,11 +139,25 @@ class Database():
     cursor.execute("""SELECT * FROM twilio_number WHERE number = %s""", (number))
     return cursor.fetchone()
 
+  def getTwilioNumberFromId(self, twilioNumberId):
+    cursor = self.db.cursor()
+    cursor.execute("""SELECT * FROM twilio_number WHERE id = %s""", (twilioNumberId))
+    return cursor.fetchone()
+
   def addTwilioNumberForUserIfNonexistent(self, user, twilioNumber):
     cursor = self.db.cursor()
     cursor.execute("""INSERT IGNORE INTO user_twilio_number (user_id, twilio_number_id) VALUES (%s, %s)""", \
       (user["id"], twilioNumber["id"]))
     cursor.close()
+    
+  def getAvailableTwilioNumberForUser(self, user):
+    cursor = self.db.cursor()
+    userId = user["id"]
+    cursor.execute("""SELECT * FROM twilio_number WHERE id NOT IN \
+      (SELECT user_one_twilio_number_id FROM conversation WHERE user_one_id = %s AND in_progress = 1)
+      AND id NOT IN (SELECT user_two_twilio_number_id FROM conversation WHERE user_two_id = %s AND in_progress = 1)""",
+      (userId, userId))
+    return cursor.fetchone()
 
   ## Interests:
   def insertInterestsIfNonexistent(self, interests):
@@ -206,17 +220,19 @@ class Database():
     return match
   
   # Inserts a new conversation with the two specified user id's.
-  def insertConversation(self, userOneId, userTwoId):
+  def insertConversation(self, userOneId, userOneTwilioNumber, userTwoId, userTwoTwilioNumber):
     cursor = self.db.cursor()
-    cursor.execute("""INSERT INTO conversation (user_one_id, user_two_id, in_progress) VALUES (%s, %s, 1)""", \
-      (userOneId, userTwoId))
+    cursor.execute("""INSERT INTO conversation (user_one_id, user_one_twilio_number_id, \
+      user_two_id, user_two_twilio_number_id, in_progress) VALUES (%s, %s, %s, %s, 1)""", \
+      (userOneId, userOneTwilioNumber["id"], userTwoId, userTwoTwilioNumber["id"]))
     cursor.close()
 
-  # Gets the current in-progress conversation for the user.
-  def getCurrentConversationForUser(self, userId):
+  # Gets the current in-progress conversation for the user on the specified twilio number.
+  def getCurrentConversationForUser(self, userId, userTwilioNumber):
     cursor = self.db.cursor()
-    cursor.execute("""SELECT * FROM conversation WHERE (user_one_id = %s OR user_two_id = %s) AND in_progress = 1""", \
-      (userId, userId))
+    cursor.execute("""SELECT * FROM conversation WHERE ((user_one_id = %s AND user_one_twilio_number_id = %s) \
+      OR (user_two_id = %s AND user_two_twilio_number_id = %s)) AND in_progress = 1""", \
+      (userId, userTwilioNumber["id"], userId, userTwilioNumber["id"]))
     return cursor.fetchone()
 
   # Ends any in-progress conversations for the user.
