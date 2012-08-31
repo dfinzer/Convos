@@ -11,7 +11,7 @@ def getValueOrAlt(dict, key, alt):
 
 # Gets the value of a dict if it exists, otherwise 'NULL'.
 def getValueOrNull(dict, key):
-  return getValueOrAlt(dict, key, "NULL")
+  return getValueOrAlt(dict, key, None)
 
 # Turns facebook data into a convenient list.
 def userDataListFromFacebookData(facebookData):
