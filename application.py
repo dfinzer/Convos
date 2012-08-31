@@ -178,11 +178,11 @@ def handleMessage(body, user, resp):
 
 # Attempts to register an existing user with the specified verification code.
 # Returns whether we were successful.
-def registerUser(verificationCode, phoneNumber):
+def registerUser(verificationCode, phoneNumber, twilioNumber):
   # Check that there exists an unregistered user with that verification code.
   existingUser = db.getUserFromVerificationCode(verificationCode)
   if existingUser:
-    db.registerUserWithPhoneNumber(existingUser["id"], phoneNumber)
+    db.registerUserWithPhoneNumber(existingUser["id"], phoneNumber, twilioNumber)
     return True
   else:
     return False
@@ -193,6 +193,7 @@ def message():
   db.openConnection()
 
   phoneNumber = request.values.get("From")
+  twilioNumber = request.values.get("To")
   body = request.values.get("Body").strip()
 
   # Log the message.
@@ -213,7 +214,7 @@ def message():
       handleMessage(body, user, resp)
   # If there's no user and the instruction is a digit, it's a verification code. So try to register the user.
   elif body.isdigit():
-    if registerUser(body, phoneNumber):
+    if registerUser(body, phoneNumber, twilioNumber):
       textingClient.sendWelcomeMessage(phoneNumber, resp)
     else:
       textingClient.sendIncorrectVerificationCodeMessage(phoneNumber, resp)

@@ -27,6 +27,21 @@ CREATE TABLE  `convos`.`user` (
   UNIQUE KEY (`phone_number`)
 ) ENGINE = MYISAM;
 
+CREATE TABLE `convos`.`twilio_number` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `number` VARCHAR ( 100 ),
+  PRIMARY KEY (  `id` )
+) ENGINE = MYISAM;
+
+# Maps users to twilio numbers with which they are registered.
+CREATE TABLE `convos`.`user_twilio_number`(
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `user_id` INT NOT NULL,
+    `twilio_number_id` INT NOT NULL,
+    PRIMARY KEY (  `id` ),
+    UNIQUE KEY `user_id` (`user_id`, `twilio_number_id`)
+) ENGINE = MYISAM;
+
 CREATE TABLE `convos`.`conversation` (
   `id` INT NOT NULL AUTO_INCREMENT ,
   `user_one_id` INT NOT NULL,
