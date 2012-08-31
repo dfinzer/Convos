@@ -2,23 +2,23 @@ import re
 
 # String constants.
 WELCOME_MESSAGE = "Welcome to Convos. To start a new convo text #new. Text \
-  #new at any time to end your current conversation and start a new one, or text #pause to take a break."
+#new at any time to end your current conversation and start a new one, or text #pause to take a break."
 INCORRECT_VERIFICATION_CODE_MESSAGE = "That verification code doesn't match our records. \
-  Make sure you entered the verification code correctly."
+Make sure you entered the verification code correctly."
 
 NEW_MATCH = "You have a new texting partner! "
 SAY_HI = "Say hi! (just reply to this number)"
 FINDING_MATCH = "Looking for a match. You'll get a text when one is available!"
 
 PARTNER_ENDED_NEW_MATCH = "Your current partner ended the conversation, but we matched \
-  you up with someone new: "
+you up with someone new: "
 PARTNER_ENDED_FINDING_MATCH = "Your current partner ended the conversation. \
-  We're looking for a new match and will text you when one is available."
+We're looking for a new match and will text you when one is available."
 
 PAUSED = "Convos is now paused. When you're ready to start again, text #new to get a new conversation."
 
 UNKNOWN_INSTRUCTION = "Convos doesn't recognize this instruction. Valid instructions are: \
-  #new - new conversation, #pause - take a break."
+#new - new conversation, #pause - take a break."
 UNKNOWN_MESSAGE = "Convos doesn't recognize this phone number. Please check that you entered the correct four-digit verification code."
 
 PHONE_NUMBER_ALREADY_REGISTERED = "This phone number is already registered with Convos. Please use a different phone number."
