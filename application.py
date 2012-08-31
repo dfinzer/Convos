@@ -281,8 +281,14 @@ def registrationStatus():
   return json.dumps(response)
   
 ## Metrics
+def genericResponse():
+  return json.dumps({"status": "ok"})
+
 def getRequestData():
-  return {"ip": request.remote_addr, "user_agent": request.headers["User-Agent"]}
+  data = {"ip": request.remote_addr, "user_agent": request.headers["User-Agent"]}
+  if "user_id" in session:
+    data["user_id"] = session["user_id"]
+  return data
 
 # Log when the user clicks the Facebook login button.
 @app.route("/api/log_clicked_facebook_login", methods=["POST"])
@@ -291,7 +297,7 @@ def logClickedFacebookLogin():
   db.openConnection()
   db.logClickedFacebookLogin(data)
   db.closeConnection()
-  return json.dumps({"status": "ok"})
+  return genericResponse()
 
 # Log when someone goes to index.html.
 @app.route("/api/log_visited_page", methods=["POST"])
@@ -302,7 +308,29 @@ def logVisitedPage():
   db.openConnection()
   db.logVisitedPage(data)
   db.closeConnection()
-  return json.dumps({"status": "ok"})
+  return genericResponse()
+  
+## Feedback/bug reports.
+def getTextAndData():
+  data = getRequestData()
+  data["form_text"] = request.values.get("form_text")
+  return data
+  
+@app.route("/api/feedback", methods=["POST"])
+def feedback():
+  db.openConnection()
+  data = getTextAndData()
+  db.insertFeedback(data)
+  db.closeConnection()
+  return genericResponse()
+  
+@app.route("/api/bug_report", methods=["POST"])
+def bugReport():
+  data = getTextAndData()
+  db.openConnection()
+  db.insertBugReport(data)
+  db.closeConnection()
+  return genericResponse()
 
 if __name__ == "__main__":
   app.run(debug=True, port=10080)

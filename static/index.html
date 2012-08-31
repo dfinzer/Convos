@@ -60,7 +60,11 @@
           <h1>Feedback</h1>
           <h2>We'd love to get your feedback!</h2>
           Feedback:<br/>
-          <textarea id="feedback-textarea"></textarea>
+          <textarea class="form_text"></textarea>
+          <br/>
+          <button onclick="submitForm('/api/feedback')">Submit</button>
+          <br/>
+          <br/>
         </div>
         
         <!-- Help box -->
@@ -71,18 +75,24 @@
           </p>
         </div>
         
+        <!-- Bug report box -->
+        <div id="bug", class="page">
+          <h1>File a Bug</h1>
+          <br/>
+          What happened?<br/>
+          <textarea class="form_text"></textarea>
+          <br/>
+          <button onclick="submitForm('/api/bug_report')">Submit</button>
+          <br/>
+          <br/>
+        </div>
+        
         <!-- Contact us box -->
         <div id="contact", class="page">
           <h1>Contact</h1>
           <p>
             Feel free to contact us at <a href="mailto:info@getconvos.com">info@getconvos.com</a>
           </p>
-        </div>
-        
-        <!-- Bug report box -->
-        <div id="bug", class="page">
-          <h1>File a Bug</h1>
-        
         </div>
         <div>
           <a href="javascript:switchPage('home')">Home</a> |
@@ -95,6 +105,7 @@
     </div>
     <!-- Javascript -->
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
+    <script src="js/util.js"></script>
     <script src="js/logging.js"></script>
     <script src="js/convos.js"></script>
     <script src="js/facebook.js"></script>

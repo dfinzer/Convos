@@ -77,3 +77,12 @@ function switchPage(pageId) {
     });
   });
 }
+
+function submitForm(url) {
+  console.log($(".page.current-page").find(".form_text").val())
+  data = {"form_text": $(".page.current-page").find(".form_text").val()}
+  $.post(url, data, function() {
+    // TODO: this is kinda ghetto.
+    alert("Thanks for your feedback!");
+  });
+}

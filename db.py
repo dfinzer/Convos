@@ -201,7 +201,8 @@ class Database():
   # Gets the current in-progress conversation for the user.
   def getCurrentConversationForUser(self, userId):
     cursor = self.db.cursor()
-    cursor.execute("""SELECT * FROM conversation WHERE (user_one_id = %s OR user_two_id = %s) AND in_progress = 1""", (userId, userId))
+    cursor.execute("""SELECT * FROM conversation WHERE (user_one_id = %s OR user_two_id = %s) AND in_progress = 1""", \
+      (userId, userId))
     return cursor.fetchone()
 
   # Ends any in-progress conversations for the user.
@@ -213,23 +214,41 @@ class Database():
   ## Messages:
   def insertMessageForConversation(self, conversationId, fromUserId, body):
     cursor = self.db.cursor()
-    cursor.execute("""INSERT INTO message (conversation_id, from_user_id, body) VALUES (%s, %s, %s)""", (conversationId, fromUserId, body))
+    cursor.execute("""INSERT INTO message (conversation_id, from_user_id, body) VALUES (%s, %s, %s)""", \
+      (conversationId, fromUserId, body))
     cursor.close()
   
   ## Logging:
+  def requestDataTuple(self, data):
+    return (getValueOrNull(data, "ip"), getValueOrNull(data, "user_agent"), getValueOrAlt(data, "user_id", 0))
+  
   def logMessage(self, phoneNumber, body, outbound):
     cursor = self.db.cursor()
-    cursor.execute("""INSERT INTO sms_log (phone_number, body, outbound) VALUES (%s, %s, %s)""", (phoneNumber, body, outbound))
+    cursor.execute("""INSERT INTO sms_log (phone_number, body, outbound) VALUES (%s, %s, %s)""", \
+      (phoneNumber, body, outbound))
     cursor.close()
     
   def logClickedFacebookLogin(self, data):
     cursor = self.db.cursor()
-    cursor.execute("""INSERT INTO clicked_facebook_login_log (ip, user_agent) VALUES (%s, %s)""", \
-      (data["ip"], data["user_agent"]));
+    cursor.execute("""INSERT INTO clicked_facebook_login_log (ip, user_agent, user_id) VALUES (%s, %s, %s)""", \
+      self.requestDataTuple(data));
     cursor.close()
     
   def logVisitedPage(self, data):
     cursor = self.db.cursor()
-    cursor.execute("""INSERT INTO visited_page_log (ip, user_agent, name) VALUES (%s, %s, %s)""", \
-      (data["ip"], data["user_agent"], data["name"]));
+    cursor.execute("""INSERT INTO visited_page_log (ip, user_agent, user_id, name) VALUES (%s, %s, %s, %s)""", \
+      self.requestDataTuple(data) + (getValueOrNull(data, "name"),));
+    cursor.close()
+    
+  ## Feedback/bug reports:
+  def insertFeedback(self, data):
+    cursor = self.db.cursor()
+    cursor.execute("""INSERT INTO feedback (ip, user_agent, user_id, form_text) VALUES (%s, %s, %s, %s)""", \
+      self.requestDataTuple(data) + (getValueOrNull(data, "form_text"),));
+    cursor.close()
+    
+  def insertBugReport(self, data):
+    cursor = self.db.cursor()
+    cursor.execute("""INSERT INTO bug_report (ip, user_agent, user_id, form_text) VALUES (%s, %s, %s, %s)""", \
+      self.requestDataTuple(data) + (getValueOrNull(data, "form_text"),));
     cursor.close()

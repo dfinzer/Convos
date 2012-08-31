@@ -32,10 +32,10 @@ function handleResponse(response) {
 // Set up Facebook Javascript SDK.
 window.fbAsyncInit = function() {
   // Configure App ID based on production vs. dev.
-  if(window.location.toString().indexOf('localhost') != -1) {
-		appId = DEV_APP_ID;
+  if(isProductionEnvironment()) {
+    appId = PRODUCTION_APP_ID;
 	} else {
-		appId = PRODUCTION_APP_ID;
+		appId = DEV_APP_ID;
 	}
 	
   FB.init({ appId: appId, 

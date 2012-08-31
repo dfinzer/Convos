@@ -70,6 +70,7 @@ CREATE TABLE `convos`.`sms_log` (
 CREATE TABLE `convos`.`clicked_facebook_login_log` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `ip` VARCHAR ( 100 ),
+  `user_id` INT,
   `user_agent` VARCHAR ( 500 ),
   `timestamp` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (  `id` )
@@ -79,7 +80,28 @@ CREATE TABLE `convos`.`visited_page_log` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `ip` VARCHAR ( 100 ),
   `user_agent` VARCHAR ( 500 ),
+  `user_id` INT,
   `name` VARCHAR ( 100 ),
+  `timestamp` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (  `id` )
+) ENGINE = MYISAM;
+
+CREATE TABLE `convos`.`feedback` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `ip` VARCHAR ( 100 ),
+  `user_agent` VARCHAR ( 500 ),
+  `user_id` INT,
+  `form_text` TEXT,
+  `timestamp` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (  `id` )
+) ENGINE = MYISAM;
+
+CREATE TABLE `convos`.`bug_report` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `ip` VARCHAR ( 100 ),
+  `user_agent` VARCHAR ( 500 ),
+  `user_id` INT,
+  `form_text` TEXT,
   `timestamp` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (  `id` )
 ) ENGINE = MYISAM;
