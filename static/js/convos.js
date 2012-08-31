@@ -9,7 +9,7 @@ $(document).ready(function() {
 
 function login() {
   $("#loader").show();
-  $("#fb-login").hide();
+  $("#fb-login-box").hide();
   $.post("/api/login", {}, function(response) {
     data = $.parseJSON(response);
     if (data.status == "pending") {
