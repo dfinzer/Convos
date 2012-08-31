@@ -7,7 +7,7 @@ INCORRECT_VERIFICATION_CODE_MESSAGE = "That verification code doesn't match our 
   Make sure you entered the verification code correctly."
 
 NEW_MATCH = "You have a new texting partner! "
-SAY_HI = "Say Hi!"
+SAY_HI = "Say hi! (just reply to this number)"
 FINDING_MATCH = "Looking for a match. You'll get a text when one is available!"
 
 PARTNER_ENDED_NEW_MATCH = "Your current partner ended the conversation, but we matched \
