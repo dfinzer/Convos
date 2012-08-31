@@ -112,10 +112,12 @@ def makeMatchAndNotify(user, userTwilioNumber, partnerEndedMatch, resp=None):
   
   # Attempt to get a new match for the user.
   newMatchedUser = db.getMatchForUser(user["id"])
-  newMatchedUserTwilioNumber = db.getAvailableTwilioNumberForUser(newMatchedUser)
   
   # Case: we found a new match.
   if newMatchedUser:
+    # Get a twilio number for the match. If everything went well, this should exist.
+    newMatchedUserTwilioNumber = db.getAvailableTwilioNumberForUser(newMatchedUser)
+    
     db.insertConversation(user["id"], userTwilioNumber, newMatchedUser["id"], newMatchedUserTwilioNumber)
     newMatchedUserInterests = db.getUserInterests(newMatchedUser["id"])
     commonInterests = db.getCommonInterests(user["id"], newMatchedUser["id"])

@@ -212,16 +212,33 @@ class Database():
       ON user.id = user_interest.user_id WHERE interest_id IN (SELECT interest.id FROM user_interest, \
       interest WHERE user_interest.user_id = %s AND user_interest.interest_id = interest.id) GROUP BY user_id \
       ORDER BY count;""", (userId));
-  
+      
+    # Get in progress conversations.
+    cursor.execute("""CREATE TEMPORARY TABLE in_progress_conversation SELECT * FROM conversation WHERE in_progress = 1;""")
+    
+    # Get all the busy user/number combinations.
+    cursor.execute("""CREATE TEMPORARY TABLE users_by_conversation \
+      SELECT user_id, in_progress_conversation.id FROM user_twilio_number
+      LEFT OUTER JOIN in_progress_conversation ON \
+      ((user_twilio_number.user_id = in_progress_conversation.user_one_id \
+        AND user_twilio_number.twilio_number_id = in_progress_conversation.user_one_twilio_number_id) OR \
+      (user_twilio_number.user_id = in_progress_conversation.user_two_id \
+        AND user_twilio_number.twilio_number_id = in_progress_conversation.user_two_twilio_number_id));""")
+
     # Get all users that haven't been matched with this user and aren't currently in 'in-progress' conversations.
     cursor.execute("""SELECT user.*, shared_interest_users.count FROM user \
       LEFT JOIN shared_interest_users ON shared_interest_users.user_id = user.id
-      WHERE id NOT IN (SELECT user_one_id FROM conversation WHERE user_two_id = %s OR in_progress = 1) \
-      AND id NOT IN (SELECT user_two_id FROM conversation WHERE user_one_id = %s OR in_progress = 1) \
+      # Weed out users that this user has been matched with.
+      WHERE id NOT IN (SELECT user_one_id FROM conversation WHERE user_two_id = %s) \
+      AND id NOT IN (SELECT user_two_id FROM conversation WHERE user_one_id = %s) \
+      AND id IN (SELECT user_id FROM users_by_conversation WHERE id IS NULL) \
       AND registration_status = 'registered' \
       AND id != %s \
       AND paused = 0 \
-      ORDER BY shared_interest_users.count DESC; DROP TABLE shared_interest_users;""", (userId, userId, userId))
+      ORDER BY shared_interest_users.count DESC; \
+      DROP TABLE shared_interest_users; \
+      DROP TABLE in_progress_conversation; \
+      DROP TABLE users_by_conversation;""", (userId, userId, userId))
     match = cursor.fetchone()
     cursor.close()
     return match
