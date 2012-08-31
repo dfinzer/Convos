@@ -221,3 +221,15 @@ class Database():
     cursor = self.db.cursor()
     cursor.execute("""INSERT INTO sms_log (phone_number, body, outbound) VALUES (%s, %s, %s)""", (phoneNumber, body, outbound))
     cursor.close()
+    
+  def logClickedFacebookLogin(self, data):
+    cursor = self.db.cursor()
+    cursor.execute("""INSERT INTO clicked_facebook_login_log (ip, user_agent) VALUES (%s, %s)""", \
+      (data["ip"], data["user_agent"]));
+    cursor.close()
+    
+  def logVisitedPage(self, data):
+    cursor = self.db.cursor()
+    cursor.execute("""INSERT INTO visited_page_log (ip, user_agent, name) VALUES (%s, %s, %s)""", \
+      (data["ip"], data["user_agent"], data["name"]));
+    cursor.close()

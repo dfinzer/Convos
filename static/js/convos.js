@@ -1,6 +1,12 @@
 var hasSetPollingInterval = false;
 var pollingIntervalId;
 
+$(document).ready(function() {
+  // Log home page visit.
+  console.log("here")
+  logVisitedPage("home");
+});
+
 function login() {
   $("#loader").show();
   $("#fb-login").hide();
@@ -48,12 +54,14 @@ function pollRegistrationStatus() {
   });
 }
 
+// Switch to the page with the specified id.
 function switchPage(pageId) {
   // Find visible page.
   $(".page.current-page").hide("slow", function() {
     $(this).removeClass("current-page");
     $("#" + pageId).show("slow", function() {
       $("#" + pageId).addClass("current-page");
+      logVisitedPage(pageId);
     });
   });
 }

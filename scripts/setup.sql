@@ -66,3 +66,20 @@ CREATE TABLE `convos`.`sms_log` (
   `timestamp` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (  `id` )
 ) ENGINE = MYISAM;
+
+CREATE TABLE `convos`.`clicked_facebook_login_log` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `ip` VARCHAR ( 100 ),
+  `user_agent` VARCHAR ( 500 ),
+  `timestamp` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (  `id` )
+) ENGINE = MYISAM;
+
+CREATE TABLE `convos`.`visited_page_log` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `ip` VARCHAR ( 100 ),
+  `user_agent` VARCHAR ( 500 ),
+  `name` VARCHAR ( 100 ),
+  `timestamp` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (  `id` )
+) ENGINE = MYISAM;

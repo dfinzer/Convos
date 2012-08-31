@@ -280,5 +280,29 @@ def registrationStatus():
   db.closeConnection()
   return json.dumps(response)
   
+## Metrics
+def getRequestData():
+  return {"ip": request.remote_addr, "user_agent": request.headers["User-Agent"]}
+
+# Log when the user clicks the Facebook login button.
+@app.route("/api/log_clicked_facebook_login", methods=["POST"])
+def logClickedFacebookLogin():
+  data = getRequestData()
+  db.openConnection()
+  db.logClickedFacebookLogin(data)
+  db.closeConnection()
+  return json.dumps({"status": "ok"})
+
+# Log when someone goes to index.html.
+@app.route("/api/log_visited_page", methods=["POST"])
+def logVisitedPage():
+  data = getRequestData()
+  data["name"] = request.values.get("name")
+
+  db.openConnection()
+  db.logVisitedPage(data)
+  db.closeConnection()
+  return json.dumps({"status": "ok"})
+
 if __name__ == "__main__":
   app.run(debug=True, port=10080)
