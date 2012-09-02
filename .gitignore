@@ -1,4 +1,5 @@
 venv
+backups
 .DS_Store
 *.pyc
 .elasticbeanstalk/
