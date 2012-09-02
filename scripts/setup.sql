@@ -64,7 +64,7 @@ CREATE TABLE  `convos`.`message` (
 
 CREATE TABLE `convos`.`interest` (
   `id` INT NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR ( 500 ) NOT NULL,
+  `name` VARCHAR ( 200 ) NOT NULL,
   PRIMARY KEY (  `id` ),
   UNIQUE KEY (`name`)
 ) ENGINE = MYISAM;
