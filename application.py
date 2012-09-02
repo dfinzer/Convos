@@ -190,7 +190,7 @@ def handleInstruction(instruction, user, userTwilioNumber, phoneNumber, resp):
     
     # Case: the user wants help options.
     elif instruction == "help":
-      textingClient.sendPauseMessage(phoneNumber, userTwilioNumber, resp)
+      textingClient.sendHelpMessage(phoneNumber, userTwilioNumber, resp)
       
     # Case: unknown instruction.
     else:

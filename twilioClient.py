@@ -91,7 +91,7 @@ class TwilioClient:
   def sendMaxConversationsMessage(self, toNumber, twilioNumber, existingResponse=None):
     self.sendMessage(toNumber, twilioNumber, MAX_CONVERSATIONS, existingResponse)
     
-  def sendPauseMessage(self, toNumber, twilioNumber, existingResponse=None):
+  def sendHelpMessage(self, toNumber, twilioNumber, existingResponse=None):
     self.sendMessage(toNumber, twilioNumber, HELP_MESSAGE, existingResponse)
     
 class TwilioTestClient(TwilioClient):
