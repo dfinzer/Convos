@@ -37,7 +37,7 @@ def userDataListFromFacebookData(facebookData):
 class Database():
   ## Connections.
   def openConnection(self):
-    self.db = MySQLdb.connect(db=DATABASE, passwd=PASSWORD, cursorclass=MySQLdb.cursors.DictCursor)
+    self.db = MySQLdb.connect(db=DATABASE, passwd=PASSWORD, cursorclass=MySQLdb.cursors.DictCursor, charset="utf8", use_unicode=True)
 
   def closeConnection(self):
     self.db.close()
