@@ -315,7 +315,6 @@ def login():
     
     # Record the user interests in the database.
     interests = interestArrayFromFacebookLikeData(facebookData[0])
-    app.logger.error("%s" % interests)
     db.setUserInterests(existingUser["id"], interests)
     
     # Set a session variable so we can keep track of this user.
