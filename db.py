@@ -165,6 +165,12 @@ class Database():
     cursor.execute("""SELECT twilio_number.* FROM twilio_number, user_twilio_number WHERE \
       user_twilio_number.user_id = %s AND user_twilio_number.twilio_number_id = twilio_number.id""", (user["id"]))
     return cursor.fetchall()
+    
+  def getNextAvailableTwilioNumberForUser(self, user):
+    cursor = self.db.cursor()
+    cursor.execute("""SELECT twilio_number.* FROM twilio_number WHERE id NOT IN \
+      (SELECT twilio_number_id FROM user_twilio_number WHERE user_id = %s)""", (user["id"]))
+    return cursor.fetchone()
 
   ## Interests:
   def insertInterestsIfNonexistent(self, interests):

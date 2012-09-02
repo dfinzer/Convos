@@ -147,9 +147,32 @@ def handleInstruction(instruction, user, userTwilioNumber, phoneNumber, resp):
       # Unpause the user.
       db.unpauseUser(userId)
       
+      conversation = db.getCurrentConversationForUser(user["id"], userTwilioNumber)
+      if conversation:
+        # Check if this user has an available twilio number.
+        availableTwilioNumber = db.getAvailableTwilioNumberForUser(user)
+        
+        # If there's no available Twilio number, we need to find a new one.
+        if not availableTwilioNumber:
+          availableTwilioNumber = db.getNextAvailableTwilioNumberForUser(user)
+        
+        # If after everything we were able to find a twilio number, go ahead and make the match.
+        if availableTwilioNumber:
+          # Register the user with this twilio number if he isn't already registered.
+          db.addTwilioNumberForUserIfNonexistent(user, availableTwilioNumber)
+          
+          makeMatchAndNotify(user, availableTwilioNumber, False, None)
+        # Otherwise notify the user that there aren't any available twilio numbers, (max conversations.)
+        else:
+          textingClient.sendMaxConversationsMessage(phoneNumber, userTwilioNumber, resp)
+      # If there's no current conversation, just make a match with this twilioNumber.
+      else:
+        makeMatchAndNotify(user, userTwilioNumber, False, resp)
+        
+    elif instruction == "end":
       # If the user is currently in a conversation, end it.
       endConversationForUserAndGetNewMatchForPartner(user, userTwilioNumber)
-
+      
       # Get a new match for the user.
       makeMatchAndNotify(user, userTwilioNumber, False, resp)
       

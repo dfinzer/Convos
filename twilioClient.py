@@ -81,16 +81,21 @@ class TwilioClient:
     self.sendMessage(toNumber, twilioNumber, PARTNER_ENDED_FINDING_MATCH)
     
   def sendNoConversationUnpauseMessage(self, toNumber, twilioNumber, existingResponse=None):
+    # TODO: why don't these include existingResponse?
     self.sendMessage(toNumber, twilioNumber, NO_CONVERSATION_UNPAUSE)
     
   def sendNoConversationMessage(self, toNumber, twilioNumber, existingResponse=None):
+    # TODO: why don't these include existingResponse?
     self.sendMessage(toNumber, twilioNumber, NO_CONVERSATION)
+  
+  def sendMaxConversationsMessage(self, toNumber, twilioNumber, existingResponse=None):
+    self.sendMessage(toNumber, twilioNumber, MAX_CONVERSATIONS, existingResponse)
     
 class TwilioTestClient(TwilioClient):
-  def sendIndividualMessage(self, toNumber, twilioNumber, body):
+  def sendMessage(self, toNumber, twilioNumber, body, existingResponse=None):
     try:
       # We use the port as the phone number.
-      sendMessage("localhost", toNumber, twilioNumber["number"], body)
+      sendMessage("localhost", int(toNumber), twilioNumber["number"], body)
     # TODO: Handle exceptions better.
     except:
       print "Connection error sending message."
