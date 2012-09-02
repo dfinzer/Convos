@@ -110,10 +110,10 @@ def newMatchString(gender, college, interests, commonInterests, newMatchMessage=
     newPartnerString += ", from " + abbreviatedCollegeString(college)
   if len(commonInterests) > 0:
     newPartnerString += " with common interests in "
-    newPartnerString += ", ".join(commonInterests[:3])
+    newPartnerString += ", ".join(commonInterests[:2])
   elif len(interests) > 0:
     newPartnerString += " with interests in "
-    newPartnerString += ", ".join(interests[:3])
+    newPartnerString += ", ".join(interests[:2])
   newPartnerString += (". " + SAY_HI)
   return newPartnerString
 
