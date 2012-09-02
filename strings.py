@@ -29,7 +29,7 @@ UNKNOWN_MESSAGE = "Convos doesn't recognize this phone number. Please check that
 PHONE_NUMBER_ALREADY_REGISTERED = "This phone number is already registered with Convos. Please use a different phone number."
 
 NO_CONVERSATION_UNPAUSE = "Convos is paused. Text #new to unpause and start a new convo."
-NO_CONVERSATION = "You aren't in a conversation with anyone at the moment. We'll text you when we find someone. Hold tight!"
+NO_CONVERSATION = "You aren't in a conversation with anyone at the moment on this number. We'll text you when we find someone. Hold tight!"
 
 MAX_CONVERSATIONS = "Sorry, you can only have 2 conversations at a time. You'll have to send #end to one of your conversations to get a \
 new partner."
