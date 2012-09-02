@@ -330,7 +330,25 @@ def registrationStatus():
     response = {"status": "nonexistent"}
   db.closeConnection()
   return json.dumps(response)
+
+@app.route("/api/end_conversation", methods=['POST'])
+def endConversation():
+  db.openConnection()
+  userId = request.values.get("user_id")
+  print userId
+  userTwilioNumberId = request.values.get("user_twilio_number_id")
+  print userTwilioNumberId
+  user = db.getUserFromId(userId)
+  userTwilioNumber = db.getTwilioNumberFromId(userTwilioNumberId)
   
+  # If the user is currently in a conversation, end it.
+  endConversationForUserAndGetNewMatchForPartner(user, userTwilioNumber)
+  
+  # Get a new match for the user.
+  makeMatchAndNotify(user, userTwilioNumber, True)
+  db.closeConnection()
+  return genericResponse()
+
 ## Metrics
 def genericResponse():
   return json.dumps({"status": "ok"})
