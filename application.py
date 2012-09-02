@@ -118,6 +118,10 @@ def makeMatchAndNotify(user, userTwilioNumber, partnerEndedMatch, resp=None):
     # Get a twilio number for the match. If everything went well, this should exist.
     newMatchedUserTwilioNumber = db.getAvailableTwilioNumberForUser(newMatchedUser)
     
+    # If we don't have an available twilio number for the matched user, something went wrong in the matching process.
+    if not newMatchedUserTwilioNumber:
+      app.logger.error("No matched twilio number for user with id %s, matched with %s" % (newMatchedUser["id"], user["id"]))
+    
     db.insertConversation(user["id"], userTwilioNumber, newMatchedUser["id"], newMatchedUserTwilioNumber)
     newMatchedUserInterests = db.getUserInterests(newMatchedUser["id"])
     commonInterests = db.getCommonInterests(user["id"], newMatchedUser["id"])
