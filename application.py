@@ -168,7 +168,8 @@ def handleInstruction(instruction, user, userTwilioNumber, phoneNumber, resp):
       # If there's no current conversation, just make a match with this twilioNumber.
       else:
         makeMatchAndNotify(user, userTwilioNumber, False, resp)
-        
+      
+    # Case: the user wants to end the current conversation on this number.
     elif instruction == "end":
       # If the user is currently in a conversation, end it.
       endConversationForUserAndGetNewMatchForPartner(user, userTwilioNumber)
@@ -187,7 +188,11 @@ def handleInstruction(instruction, user, userTwilioNumber, phoneNumber, resp):
       db.pauseUser(userId)
       textingClient.sendPauseMessage(phoneNumber, userTwilioNumber, resp)
     
-    # Case: unknown instruction
+    # Case: the user wants help options.
+    elif instruction == "help":
+      textingClient.sendPauseMessage(phoneNumber, userTwilioNumber, resp)
+      
+    # Case: unknown instruction.
     else:
       textingClient.sendUnknownInstructionMessage(phoneNumber, resp)
 

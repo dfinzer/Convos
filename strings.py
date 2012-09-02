@@ -1,14 +1,19 @@
 import re
 
 # String constants.
-WELCOME_MESSAGE = "Welcome to Convos. To start a new convo text #new. Text \
-#new at any time to end your current conversation and start a new one, or text #pause to take a break."
+WELCOME_MESSAGE = "Welcome to Convos! To start a new convo text #new. Text \
+#new at any time to start a new convo (without ending your current one), or #help for more options."
+
+HELP_MESSAGE = "#new - get a new partner (without ending your current convo)\n\
+#end - end the current convo on this number\n\
+#pause - take a break (end all current convos)"
+
 INCORRECT_VERIFICATION_CODE_MESSAGE = "That verification code doesn't match our records. \
 Make sure you entered the verification code correctly."
 
 NEW_MATCH = "You have a new texting partner! "
 SAY_HI = "Say hi! (just reply to this number)"
-FINDING_MATCH = "Looking for a match. You'll get a text when one is available!"
+FINDING_MATCH = "Looking for a new match. You'll get a text when one is available!"
 
 PARTNER_ENDED_NEW_MATCH = "Your current partner ended the conversation, but we matched \
 you up with someone new: "
