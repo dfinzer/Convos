@@ -1,3 +1,4 @@
+var numberOfPolls = 0;
 var hasSetPollingInterval = false;
 var pollingIntervalId;
 
@@ -55,6 +56,10 @@ function showGetStartedBox() {
 }
 
 function pollRegistrationStatus() {
+  numberOfPolls++;
+  if (numberOfPolls > 100) {
+    return;
+  }
   $.get("/api/registration_status", {}, function(response) {
     data = $.parseJSON(response);
     if (data.status == "registered") {
@@ -79,7 +84,6 @@ function switchPage(pageId) {
 }
 
 function submitForm(url) {
-  console.log($(".page.current-page").find(".form_text").val())
   data = {"form_text": $(".page.current-page").find(".form_text").val()}
   $.post(url, data, function() {
     // TODO: this is kinda ghetto.
