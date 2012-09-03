@@ -58,6 +58,7 @@ function showGetStartedBox() {
 function pollRegistrationStatus() {
   numberOfPolls++;
   if (numberOfPolls > 100) {
+    clearInterval(pollingIntervalId);
     return;
   }
   $.get("/api/registration_status", {}, function(response) {
