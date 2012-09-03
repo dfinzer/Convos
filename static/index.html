@@ -5,13 +5,19 @@
     <link href="css/styles.css" rel="stylesheet">
   </head>
   <body>
+    <!-- Go to the mobile site if the screen size is small -->
+    <script type="text/javascript">
+    if (screen.width <= 699) {
+      document.location = "mobile.html";
+    }
+    </script>
     <div id="fb-root"></div>
     <br/>
     <div class="container">
       <div class="hero-unit">
         <div id="home" class="page current-page">
           <h1>Welcome to Convos</h1>
-          <h2>Make new friends over text!</h2>
+          <br/>
           <p>
             Convos is a text roulette app that pairs you up with other Brown students based on common interests.
             It's all through texting, so you don't even need to install an app! And we'll never share your phone number or post on your wall!

@@ -1,0 +1,64 @@
+<html>
+  <head>
+    <title>Convos</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.css" />
+    <link rel="stylesheet" href="css/styles.css" />
+    <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+    <script src="http://code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.js"></script>
+    <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+  </head>
+  <body>
+    <div data-role="page">
+      <div id="fb-root"></div>
+      
+    	<div data-role="header">
+    		<h1>Convos</h1>
+    	</div><!-- /header -->
+
+    	<div data-role="content">	
+    		<p>Welcome to Convos — a text roulette app that pairs you up with other Brown students based on common interests.</p>		
+
+      	
+      	<div id="fb-login-box">
+          <a id="fb-login" data-role="button" data-theme="b">
+          Login With Facebook
+          </a>
+        	<p>(Don't worry, we'll never post on your wall.)</p>
+        </div>
+      	
+      	<div id="loader">
+          <img src="images/ajax-loader.gif"></img>
+          <br/>
+          Generating verification code...
+          <br/>
+          <br/>
+        </div>
+      
+        <!-- Verification code box -->
+        <div id="verification-code-box">
+          <p>
+          You're almost there! Just text <b><span id="verification-code"></span></b>
+          to <b>(925) 272-0008</b> to get started. Don't worry, no one will ever see your phone number.
+          </p>
+        </div>
+
+        <!-- Getting started box -->
+        <div id="get-started-box">
+          <p>
+          You're all set up! To get started, just text <b>#new</b> to <b>(925) 272-0008</b> and we'll match you up!
+          <p>
+          (Text <b>#help</b> at any time to see your options)
+          </p>
+          </p>
+        </div>
+    	</div>
+    </div>
+    
+    <!-- Defer loading -->
+    <script src="js/util.js"></script>
+    <script src="js/logging.js"></script>
+    <script src="js/convos.js"></script>
+    <script src="js/facebook.js"></script>
+  </body>
+</html>
