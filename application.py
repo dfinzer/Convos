@@ -405,9 +405,14 @@ def bugReport():
 
 ## Admin urls.
 # Gets all the SMS sent for a particular phone number and twilio number combo.
-@app.route("/api/admin/get_messages", methods=["POST"])
+@app.route("/api/admin/get_messages", methods=["GET"])
 def getMessages():
-  pass
+  db.openConnection()
+  phoneNumber = request.values.get("phone_number")
+  twilioNumber = db.getTwilioNumberFromNumber(request.values.get("twilio_number"))
+  messages = db.getMessagesForPhoneNumberAndTwilioNumber(phoneNumber, twilioNumber)
+  db.closeConnection()
+  return json.dumps(messages)
 
 if __name__ == "__main__":
   app.run(debug=True, port=10080)

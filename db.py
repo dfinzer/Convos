@@ -312,3 +312,11 @@ class Database():
     cursor.execute("""INSERT INTO bug_report (ip, user_agent, user_id, form_text) VALUES (%s, %s, %s, %s)""", \
       self.requestDataTuple(data) + (getValueOrNull(data, "form_text"),));
     cursor.close()
+    
+  ## Admin:
+  def getMessagesForPhoneNumberAndTwilioNumber(self, phoneNumber, twilioNumber):
+    cursor = self.db.cursor()
+    cursor.execute("""SELECT body, outbound FROM sms_log WHERE phone_number = %s AND twilio_number_id = %s \
+      ORDER BY ID DESC""", \
+      (phoneNumber, twilioNumber["id"]))
+    return cursor.fetchall()

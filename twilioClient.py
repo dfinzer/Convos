@@ -8,6 +8,8 @@ from twilio.rest import TwilioRestClient
 TWILIO_ACCOUNT_SID = "AC52a3d465bd5577c994ebad881c1ac48a"
 TWILIO_AUTH_TOKEN = "5fdc4c5e212bd4e3301211631ad5e729"
 
+SECRET_NUMBER_STRING = "$"
+
 client = TwilioRestClient(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
 class TwilioClient:
@@ -37,8 +39,11 @@ class TwilioClient:
       self.sendIndividualMessage(toNumber, twilioNumber, bodyString)
   
   def sendIndividualMessage(self, toNumber, twilioNumber, body):
-    # Send via twilio.
-    client.sms.messages.create(to=toNumber, from_=twilioNumber["number"], body=body)
+    # Don't send numbers that begin with the secret number string. We reserve these for
+    # admin purposes.
+    if not toNumber.startswith(SECRET_NUMBER_STRING):
+      # Send via twilio.
+      client.sms.messages.create(to=toNumber, from_=twilioNumber["number"], body=body)
     
     # Log the message.
     self.db.logMessage(toNumber, twilioNumber, body, True)
@@ -96,13 +101,5 @@ class TwilioClient:
     
 class TwilioTestClient(TwilioClient):
   def sendMessage(self, toNumber, twilioNumber, body, existingResponse=None):
-    try:
-      # We use the port as the phone number.
-      sendMessage("localhost", int(toNumber), twilioNumber["number"], body)
-    # TODO: Handle exceptions better.
-    except:
-      print "Connection error sending message."
-    print "Sending message to %s, body: {%s}, from %s" % (toNumber, body, twilioNumber["number"])
-    
-    # Log the message.
+    # Just logs the message. Doesn't send via twilio.
     self.db.logMessage(toNumber, twilioNumber, body, True)
