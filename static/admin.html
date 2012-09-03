@@ -1,0 +1,39 @@
+<html>
+  <head>
+    <title>Convos Admin</title>
+    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/styles.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="container">
+      <div class="hero-unit">
+        <div id="home" class="page current-page">
+          <h1>Convos Admin</h1>
+        </div>
+        
+        <!-- Facebook login button -->
+        <div id="fb-login-box">
+          <a id="fb-login" class="btn btn-primary btn-large">
+          Login With Facebook
+          </a>
+          <br/><br/>
+        </div>
+        
+        <div id="admin-panel" class="well">
+          <div id="number-selector" class="well">
+            User Phone Number: <input type="text"></input><br/>
+            Twilio Number: <input type="text"></input><br/>
+            <button>Go</button>
+          </div>
+        
+          <!-- Displays the to and from messages for the desired number -->
+          <div id="messages" class="well">
+            <div class="message template">(recieved) Hey there.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="js/util.js"></script>
+    <script src="js/facebook.js"></script>
+  </body>
+</html>

@@ -403,5 +403,11 @@ def bugReport():
   db.closeConnection()
   return genericResponse()
 
+## Admin urls.
+# Gets all the SMS sent for a particular phone number and twilio number combo.
+@app.route("/api/admin/get_messages", methods=["POST"])
+def getMessages():
+  pass
+
 if __name__ == "__main__":
   app.run(debug=True, port=10080)
