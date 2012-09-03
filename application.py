@@ -339,9 +339,7 @@ def registrationStatus():
 def endConversation():
   db.openConnection()
   userId = request.values.get("user_id")
-  print userId
   userTwilioNumberId = request.values.get("user_twilio_number_id")
-  print userTwilioNumberId
   user = db.getUserFromId(userId)
   userTwilioNumber = db.getTwilioNumberFromId(userTwilioNumberId)
   
