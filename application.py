@@ -142,63 +142,61 @@ def makeMatchAndNotify(user, userTwilioNumber, partnerEndedMatch, resp=None):
       textingClient.sendFindingMatchMessage(userPhoneNumber, userTwilioNumber, resp)
 
 # Handle an instruction from the user. Includes getting matches, stopping conversations, and verifying accounts.
-def handleInstruction(instruction, user, userTwilioNumber, phoneNumber, resp):  
-  # If there's a user, handle the instruction.
-  if user:
-    userId = user["id"]
-    # Case: the user wants a new conversation.
-    if instruction == "new":
-      # Unpause the user.
-      db.unpauseUser(userId)
-      
-      conversation = db.getCurrentConversationForUser(user["id"], userTwilioNumber)
-      if conversation:
-        # Check if this user has an available twilio number.
-        availableTwilioNumber = db.getAvailableTwilioNumberForUser(user)
-        
-        # If there's no available Twilio number, we need to find a new one.
-        if not availableTwilioNumber:
-          availableTwilioNumber = db.getNextAvailableTwilioNumberForUser(user)
-        
-        # If after everything we were able to find a twilio number, go ahead and make the match.
-        if availableTwilioNumber:
-          # Register the user with this twilio number if he isn't already registered.
-          db.addTwilioNumberForUserIfNonexistent(user, availableTwilioNumber)
-          
-          makeMatchAndNotify(user, availableTwilioNumber, False, None)
-        # Otherwise notify the user that there aren't any available twilio numbers, (max conversations.)
-        else:
-          textingClient.sendMaxConversationsMessage(phoneNumber, userTwilioNumber, resp)
-      # If there's no current conversation, just make a match with this twilioNumber.
-      else:
-        makeMatchAndNotify(user, userTwilioNumber, False, resp)
-      
-    # Case: the user wants to end the current conversation on this number.
-    elif instruction == "end":
-      # If the user is currently in a conversation, end it.
-      endConversationForUserAndGetNewMatchForPartner(user, userTwilioNumber)
-      
-      # Get a new match for the user.
-      makeMatchAndNotify(user, userTwilioNumber, False, resp)
-      
-    # Case: the user wants to pause service.
-    elif instruction == "pause":
-      # End all active conversations for this user; that means we need to go through all of the user's twilio numbers
-      # and pause and active conversations.
-      for twilioNumber in db.getTwilioNumbersForUser(user):
-        endConversationForUserAndGetNewMatchForPartner(user, twilioNumber)
-      
-      # Pause this user.
-      db.pauseUser(userId)
-      textingClient.sendPauseMessage(phoneNumber, userTwilioNumber, resp)
+def handleInstructionOrMessage(body, user, userTwilioNumber, phoneNumber, resp):  
+  userId = user["id"]
+  # Case: the user wants a new conversation.
+  if body == "#new":
+    # Unpause the user.
+    db.unpauseUser(userId)
     
-    # Case: the user wants help options.
-    elif instruction == "help":
-      textingClient.sendHelpMessage(phoneNumber, userTwilioNumber, resp)
+    conversation = db.getCurrentConversationForUser(user["id"], userTwilioNumber)
+    if conversation:
+      # Check if this user has an available twilio number.
+      availableTwilioNumber = db.getAvailableTwilioNumberForUser(user)
       
-    # Case: unknown instruction.
+      # If there's no available Twilio number, we need to find a new one.
+      if not availableTwilioNumber:
+        availableTwilioNumber = db.getNextAvailableTwilioNumberForUser(user)
+      
+      # If after everything we were able to find a twilio number, go ahead and make the match.
+      if availableTwilioNumber:
+        # Register the user with this twilio number if he isn't already registered.
+        db.addTwilioNumberForUserIfNonexistent(user, availableTwilioNumber)
+        
+        makeMatchAndNotify(user, availableTwilioNumber, False, None)
+      # Otherwise notify the user that there aren't any available twilio numbers, (max conversations.)
+      else:
+        textingClient.sendMaxConversationsMessage(phoneNumber, userTwilioNumber, resp)
+    # If there's no current conversation, just make a match with this twilioNumber.
     else:
-      textingClient.sendUnknownInstructionMessage(phoneNumber, resp)
+      makeMatchAndNotify(user, userTwilioNumber, False, resp)
+    
+  # Case: the user wants to end the current conversation on this number.
+  elif body == "#end":
+    # If the user is currently in a conversation, end it.
+    endConversationForUserAndGetNewMatchForPartner(user, userTwilioNumber)
+    
+    # Get a new match for the user.
+    makeMatchAndNotify(user, userTwilioNumber, False, resp)
+    
+  # Case: the user wants to pause service.
+  elif body == "#pause":
+    # End all active conversations for this user; that means we need to go through all of the user's twilio numbers
+    # and pause and active conversations.
+    for twilioNumber in db.getTwilioNumbersForUser(user):
+      endConversationForUserAndGetNewMatchForPartner(user, twilioNumber)
+    
+    # Pause this user.
+    db.pauseUser(userId)
+    textingClient.sendPauseMessage(phoneNumber, userTwilioNumber, resp)
+  
+  # Case: the user wants help options.
+  elif body == "#help":
+    textingClient.sendHelpMessage(phoneNumber, userTwilioNumber, resp)
+    
+  # Case: message.
+  else:
+    handleMessage(body, user, userTwilioNumber, resp)
 
 # Handle an incoming message. Route the message to the appropriate user.
 def handleMessage(body, user, userTwilioNumber, resp):
@@ -261,11 +259,7 @@ def message():
     # Register the user with this twilio user if he's not already registered (no matter what he sent.)
     db.addTwilioNumberForUserIfNonexistent(user, twilioNumber)
     
-    if body.startswith("#"):
-      handleInstruction(body[1:], user, twilioNumber, phoneNumber, resp)
-    # Otherwise, we need to route this message.
-    else:
-      handleMessage(body, user, twilioNumber, resp)
+    handleInstructionOrMessage(body, user, twilioNumber, phoneNumber, resp)
   # If there's no user and the instruction is a digit, it's a verification code. So try to register the user.
   elif body.isdigit():
     if registerUser(body, phoneNumber, twilioNumber):
