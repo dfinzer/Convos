@@ -341,7 +341,7 @@ def login():
         twilioNumber = db.getNextAvailableTwilioNumberForUser(existingUser)
         
         # Register the user.
-        db.registerUserWithPhoneNumber(existingUser["id"], existingUser["phone_number"], twilioNumber):
+        db.registerUserWithPhoneNumber(existingUser["id"], existingUser["phone_number"], twilioNumber)
         
         # Send the user a welcome message.
         textingClient.sendWelcomeMessage(existingUser["phone_number"], twilioNumber)
