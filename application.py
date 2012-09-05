@@ -436,8 +436,10 @@ def getMessages():
   db.openConnection()
   if "user_id" in session:
     user = db.getUserFromId(session["user_id"])
-    if user.name != "Devin Finzer"
-      return json.dumps("Unauthorized.")
+    if user["name"] != "Devin Finzer":
+      return "Unauthorized."
+  else:
+    return "Need to log in."
   phoneNumber = request.values.get("phone_number")
   twilioNumber = db.getTwilioNumberFromNumber(request.values.get("twilio_number"))
   messages = db.getMessagesForPhoneNumberAndTwilioNumber(phoneNumber, twilioNumber)

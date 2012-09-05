@@ -41,3 +41,14 @@ function sendMessage(phoneNumber, twilioNumber, body) {
     getMessages(phoneNumber, twilioNumber);
   });
 }
+
+function login() {
+  $("#fb-login-box").hide();
+  $("#loader").show();
+  $.post("/api/login", {}, function(response) {    
+    data = $.parseJSON(response);
+    $("#loader").hide();
+  }).error(function() {
+    showErrorBox();
+  });
+}
