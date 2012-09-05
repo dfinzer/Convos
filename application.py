@@ -338,7 +338,7 @@ def login():
       # If everything went well, we can update the user's Facebook data and register him.
       if existingUser:
         db.updateUserFromFacebookData(existingUser["id"], profile)
-        twilioNumber = db.getNextAvailableTwilioNumberForUser(user)
+        twilioNumber = db.getNextAvailableTwilioNumberForUser(existingUser)
         db.registerUserWithPhoneNumber(existingUser["id"], existingUser["phone_number"], twilioNumber)
         response = {"status": "registered"}
         foundUser = True
