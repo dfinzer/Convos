@@ -32,7 +32,8 @@ def userDataListFromFacebookData(facebookData):
     getValueOrNull(facebookData, "location_id"), \
     getValueOrNull(facebookData, "location_name"), \
     getValueOrNull(facebookData, "birthday"), \
-    getValueOrNull(facebookData, "college"))
+    getValueOrNull(facebookData, "college"),
+    getValueOrNull(facebookData, "interested_in"))
     
 class Database():
   ## Connections.
@@ -60,8 +61,8 @@ class Database():
   
     # Insert a new user if one with the specified fb_uid does not already exist.
     cursor.execute("""INSERT INTO user (name, first_name, last_name, email, locale, username, gender, \
-      fb_uid, fb_verified, location_id, location_name, birthday, college, registration_status, verification_code, paused) \
-      VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 1)""", \
+      fb_uid, fb_verified, location_id, location_name, birthday, college, interested_in, registration_status, verification_code, paused) \
+      VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 1)""", \
       userDataListFromFacebookData(facebookData) + ("pending", verificationCode))
     cursor.close()
 
@@ -88,7 +89,8 @@ class Database():
       location_id = %s, \
       location_name = %s, \
       birthday = %s, \
-      college = %s \
+      college = %s, \
+      interested_in = %s
       WHERE id = %s""", userDataListFromFacebookData(facebookData) + (userId,))
     cursor.close()
 
@@ -223,8 +225,22 @@ class Database():
 
   ## Conversations:
   # TODO: combine this method into one query.
-  def getMatchForUser(self, userId):
+  def getMatchForUser(self, user):
     cursor = self.db.cursor()
+    userId = user["id"]
+    
+    # Get the users interests, and use that to decide who to search for.
+    interestedIn = user["interested_in"]
+    matchGenders = ["male", "female"]
+    
+    # Narrow down the search based on what the user is interested in.
+    if interestedIn == "M":
+      matchGenders = ["male"]
+    elif interestedIn == "F":
+      matchGenders = ["female"]
+    matchGenderFormats = ["%s"] * len(matchGenders)
+    matchGenderFormatString = "(" + ",".join(matchGenderFormats) + ")"
+    
     # First get users with shared interests
     cursor.execute("""CREATE TEMPORARY TABLE shared_interest_users \
       SELECT COUNT(*) AS count, user_id FROM user_interest LEFT JOIN user \
@@ -254,10 +270,11 @@ class Database():
       AND registration_status = 'registered' \
       AND id != %s \
       AND paused = 0 \
-      ORDER BY shared_interest_users.count DESC; \
+      AND gender IN """ + matchGenderFormatString + \
+      """ORDER BY shared_interest_users.count DESC; \
       DROP TABLE shared_interest_users; \
       DROP TABLE in_progress_conversation; \
-      DROP TABLE users_by_conversation;""", (userId, userId, userId))
+      DROP TABLE users_by_conversation;""", (userId, userId, userId) + tuple(matchGenders))
     match = cursor.fetchone()
     cursor.close()
     return match

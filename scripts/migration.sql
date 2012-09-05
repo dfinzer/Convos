@@ -6,3 +6,5 @@ ALTER TABLE sms_log ADD `twilio_number_id` INT NOT NULL AFTER phone_number;
 # Change interest key for utf-8 support.
 ALTER TABLE interest CHANGE name name VARCHAR(200);
 ALTER TABLE interest MODIFY name VARCHAR(200) CHARACTER SET utf8;
+
+ALTER TABLE user ADD `interested_in` VARCHAR( 10 ) AFTER college;

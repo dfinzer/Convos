@@ -92,6 +92,16 @@ def findMostRecentCollegeFromFacebookData(facebookData):
     return maxCollege + ", " + str(maxYear) if maxYear != 0 else maxCollege
   return None
 
+def getInterestedInStringFromFacebookData(facebookData):
+  if "meeting_sex" in facebookData:
+    meetingSexArray = facebookData["meeting_sex"]
+  interestInString = ""
+  if "male" in meetingSexArray:
+    interestInString += "M"
+  if "female" in meetingSexArray:
+    interestInString += "F"
+  return interestInString
+
 # Ends the specified conversation and gets a new match for the rejected partner.
 def endConversationForUserAndGetNewMatchForPartner(user, userTwilioNumber):
   conversation = db.getCurrentConversationForUser(user["id"], userTwilioNumber)
@@ -111,7 +121,7 @@ def makeMatchAndNotify(user, userTwilioNumber, partnerEndedMatch, resp=None):
   userPhoneNumber = user["phone_number"]
   
   # Attempt to get a new match for the user.
-  newMatchedUser = db.getMatchForUser(user["id"])
+  newMatchedUser = db.getMatchForUser(user)
   
   # Case: we found a new match.
   if newMatchedUser:
@@ -292,9 +302,13 @@ def login():
   if user:
     graph = facebook.GraphAPI(user["access_token"])
     profile = graph.get_object("me")
+        
+    # Update the user's education, interest, and interested_in data.
+    facebookData = graph.fql("SELECT " + ",".join(FACEBOOK_INTERESTS) + ", education, meeting_sex FROM user WHERE uid = me()")
+    interestedInString = getInterestedInStringFromFacebookData(facebookData[0])
+    if interestedInString:
+      profile["interested_in"] = interestedInString
     
-    # Update the user's network and education data.
-    facebookData = graph.fql("SELECT " + ",".join(FACEBOOK_INTERESTS) + ", education FROM user WHERE uid = me()")
     collegeString = findMostRecentCollegeFromFacebookData(facebookData[0])
     if collegeString:
       profile["college"] = collegeString

@@ -3,7 +3,8 @@ var PRODUCTION_APP_ID = '326547147430900';
 
 function facebookLogin() {
   logClickedFacebookLogin();
-  FB.login(function(response) { }, {scope:'email,user_location,user_birthday,user_education_history,user_likes'});
+  FB.login(function(response) { },
+    {scope:'email,user_location,user_birthday,user_education_history,user_likes,user_relationship_details'});
 }
 
 function facebookLogout() {
@@ -11,6 +12,7 @@ function facebookLogout() {
 }
 
 function showLoginButton() {
+  $("#fb-login").unbind("click");
   $("#fb-login").click(function() {
     facebookLogin();
   });
