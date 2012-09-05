@@ -93,13 +93,15 @@ def findMostRecentCollegeFromFacebookData(facebookData):
   return None
 
 def getInterestedInStringFromFacebookData(facebookData):
+  interestInString = ""
   if "meeting_sex" in facebookData:
     meetingSexArray = facebookData["meeting_sex"]
-  interestInString = ""
-  if "male" in meetingSexArray:
-    interestInString += "M"
-  if "female" in meetingSexArray:
-    interestInString += "F"
+    if meetingSexArray:
+      if "male" in meetingSexArray:
+        interestInString += "M"
+      if "female" in meetingSexArray:
+        interestInString += "F"
+      return interestInString
   return interestInString
 
 # Ends the specified conversation and gets a new match for the rejected partner.
