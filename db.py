@@ -69,8 +69,8 @@ class Database():
   # Inserts a  new user with pending registration status, verification code, and phone number.
   def insertUserFromPhoneData(self, phoneNumber, verificationCode):
     cursor = self.db.cursor()
-    cursor.execute("""INSERT IGNORE INTO user (registration_status, phone_number, verification_code) \
-      VALUES (%s, %s, %s)""", ("pending", phoneNumber, verificationCode))
+    cursor.execute("""INSERT IGNORE INTO user (registration_status, phone_number, verification_code, paused) \
+      VALUES (%s, %s, %s, 1)""", ("pending", phoneNumber, verificationCode))
     cursor.close()
   
   # Updates Facebook data for the user with the specified user id.
