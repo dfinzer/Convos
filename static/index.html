@@ -8,7 +8,8 @@
     <!-- Redirect to the mobile site if the screen size is small -->
     <script type="text/javascript">
     if (screen.width <= 699) {
-      document.location = "mobile.html";
+      var params = window.location.href.slice(window.location.href.indexOf("?"))
+      document.location = "mobile.html" + params;
     }
     </script>
     <div id="fb-root"></div>
