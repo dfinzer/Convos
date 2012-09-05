@@ -339,7 +339,13 @@ def login():
       if existingUser:
         db.updateUserFromFacebookData(existingUser["id"], profile)
         twilioNumber = db.getNextAvailableTwilioNumberForUser(existingUser)
-        db.registerUserWithPhoneNumber(existingUser["id"], existingUser["phone_number"], twilioNumber)
+        
+        # Register the user.
+        db.registerUserWithPhoneNumber(existingUser["id"], existingUser["phone_number"], twilioNumber):
+        
+        # Send the user a welcome message.
+        textingClient.sendWelcomeMessage(existingUser["phone_number"], twilioNumber)
+        
         response = {"status": "registered"}
         foundUser = True
 
