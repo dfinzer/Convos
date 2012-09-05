@@ -34,6 +34,8 @@ NO_CONVERSATION = "You aren't in a conversation with anyone at the moment on thi
 MAX_CONVERSATIONS = "Sorry, you can only have 2 conversations at a time. You'll have to send #end to one of your conversations to get a \
 new partner."
 
+SIGNUP_URL = "Welcome to Convos. To get started, click the following url: http://getconvos.com?code=%s"
+
 # Other constants.
 SMS_MAX_LENGTH = 160
 
@@ -119,3 +121,6 @@ def newMatchString(gender, college, interests, commonInterests, newMatchMessage=
 
 def partnerEndedNewMatchString(gender, college, interests, commonInterests):
   return newMatchString(gender, college, interests, commonInterests, PARTNER_ENDED_NEW_MATCH)
+  
+def signupUrlString(verificationCode):
+  return SIGNUP_URL % verificationCode

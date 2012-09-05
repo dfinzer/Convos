@@ -99,6 +99,10 @@ class TwilioClient:
   def sendHelpMessage(self, toNumber, twilioNumber, existingResponse=None):
     self.sendMessage(toNumber, twilioNumber, HELP_MESSAGE, existingResponse)
     
+  def sendSignupUrl(self, toNumber, twilioNumber, verificationCode, existingResponse=None):
+    signupMessage = signupUrlString(verificationCode)
+    self.sendMessage(toNumber, twilioNumber, signupMessage, existingResponse)
+    
 class TwilioTestClient(TwilioClient):
   def sendMessage(self, toNumber, twilioNumber, body, existingResponse=None):
     # Just logs the message. Doesn't send via twilio.

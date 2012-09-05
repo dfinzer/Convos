@@ -266,6 +266,14 @@ def message():
       textingClient.sendWelcomeMessage(phoneNumber, twilioNumber, resp)
     else:
       textingClient.sendIncorrectVerificationCodeMessage(phoneNumber, twilioNumber, resp)
+  # Otherwise the user is coming from mobile.
+  elif body == "#signup" or body == "signup":
+    # Create a new user, with registration status pending.
+    verificationCode = str(db.generateUniqueVerificationCode())
+    db.insertUserFromPhoneData(phoneNumber, verificationCode)
+    
+    # Send the user a signup url.
+    textingClient.sendSignupUrl(phoneNumber, twilioNumber, verificationCode, resp)
   else:
     textingClient.sendUnknownMessage(phoneNumber, twilioNumber, resp)
 
@@ -275,7 +283,9 @@ def message():
 @app.route("/api/login", methods=['POST'])
 def login():
   db.openConnection()
-  
+
+  # Get the user and url code (if it exists).
+  urlCode = request.values.get("code")  
   user = facebook.get_user_from_cookie(request.cookies, facebookAppId, facebookSecret)
   
   # TODO: just check the user's session uid instead of going to Facebook every time.
@@ -289,6 +299,9 @@ def login():
     if collegeString:
       profile["college"] = collegeString
     
+    # Now begin searching for this user based on the available data (facebook data, verification code).
+    foundUser = False
+    
     # Check if this user already exists in the database.
     existingUser = db.getUserFromFacebookUid(user["uid"])
     if existingUser:
@@ -300,7 +313,22 @@ def login():
       
       # Update the user with his Facebook data.
       db.updateUserFromFacebookData(existingUser["id"], profile)
-    else:
+      foundUser = True      
+    # If there's a new url code, see if there's a user in the database for this code.
+    elif urlCode:
+      # Check for an existing unregistered user.
+      existingUser = db.getUnregisteredUserFromVerificationCode(urlCode)
+      
+      # If everything went well, we can update the user's Facebook data and register him.
+      if existingUser:
+        db.updateUserFromFacebookData(existingUser["id"], profile)
+        twilioNumber = db.getNextAvailableTwilioNumberForUser(user)
+        db.registerUserWithPhoneNumber(existingUser["id"], existingUser["phone_number"], twilioNumber)
+        response = {"status": "registered"}
+        foundUser = True
+
+    # If we didn't find a user via the Facebook data or the urlCode, we need to make a new one.
+    if not foundUser:
       # Create a new user, with registration status pending.
       verificationCode = str(db.generateUniqueVerificationCode())
       db.insertUserFromFacebookData(profile, verificationCode)
@@ -308,8 +336,12 @@ def login():
       existingUser = db.getUserFromFacebookUid(user["uid"])
     
     # Record the user interests in the database.
-    interests = interestArrayFromFacebookLikeData(facebookData[0])
-    db.setUserInterests(existingUser["id"], interests)
+    try:
+      interests = interestArrayFromFacebookLikeData(facebookData[0])
+      db.setUserInterests(existingUser["id"], interests)
+    # If anything goes wrong, we still want to continue, but we'll log an error.
+    except Exception as e:
+      app.logger.error(e)
     
     # Set a session variable so we can keep track of this user.
     session["user_id"] = existingUser["id"]
@@ -402,6 +434,10 @@ def bugReport():
 @app.route("/api/admin/get_messages", methods=["GET"])
 def getMessages():
   db.openConnection()
+  if "user_id" in session:
+    user = db.getUserFromId(session["user_id"])
+    if user.name != "Devin Finzer"
+      return json.dumps("Unauthorized.")
   phoneNumber = request.values.get("phone_number")
   twilioNumber = db.getTwilioNumberFromNumber(request.values.get("twilio_number"))
   messages = db.getMessagesForPhoneNumberAndTwilioNumber(phoneNumber, twilioNumber)

@@ -65,6 +65,13 @@ class Database():
       userDataListFromFacebookData(facebookData) + ("pending", verificationCode))
     cursor.close()
 
+  # Inserts a  new user with pending registration status, verification code, and phone number.
+  def insertUserFromPhoneData(self, phoneNumber, verificationCode):
+    cursor = self.db.cursor()
+    cursor.execute("""INSERT IGNORE INTO user (registration_status, phone_number, verification_code) \
+      VALUES (%s, %s, %s)""", ("pending", phoneNumber, verificationCode))
+    cursor.close()
+  
   # Updates Facebook data for the user with the specified user id.
   def updateUserFromFacebookData(self, userId, facebookData):
     cursor = self.db.cursor()
@@ -105,7 +112,13 @@ class Database():
   # Gets a user with the specified phone number.
   def getUserFromPhoneNumber(self, phoneNumber):
     cursor = self.db.cursor()
-    cursor.execute("""SELECT * FROM user WHERE phone_number = %s""", (phoneNumber))
+    cursor.execute("""SELECT * FROM user WHERE phone_number = %s AND registration_status = 'registered'""", (phoneNumber))
+    return cursor.fetchone()
+  
+  # Gets an unregistered user from verification code.
+  def getUnregisteredUserFromVerificationCode(self, verificationCode):
+    cursor = self.db.cursor()
+    cursor.execute("""SELECT * FROM user WHERE verification_code = %s AND registration_status = 'pending'""", (verificationCode))
     return cursor.fetchone()
   
   # Associates the specified user account with the phone number.

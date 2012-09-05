@@ -23,7 +23,8 @@ $(document).ready(function() {
 function login() {
   $("#loader").show();
   $("#fb-login-box").hide();
-  $.post("/api/login", {}, function(response) {
+  code = getUrlValues()["code"];
+  $.post("/api/login", {"code": code}, function(response) {    
     data = $.parseJSON(response);
     if (data.status == "pending") {
       $("#verification-code").text(data.verification_code)
