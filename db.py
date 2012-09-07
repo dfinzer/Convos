@@ -49,28 +49,28 @@ class Database():
     cursor = self.db.cursor()
     cursor.execute("""SELECT verification_code FROM user WHERE registration_status = 'pending' ORDER BY verification_code DESC""")
     lastVerificationCode = cursor.fetchone()
-    if lastVerificationCode:
+    if lastVerificationCode and lastVerificationCode["verification_code"]:
       code = int(lastVerificationCode["verification_code"]) + 1
     else:
       code = 1000
     return code
 
   # Inserts a new user with pending registration status and specified verification code into the table.
-  def insertUserFromFacebookData(self, facebookData, verificationCode):
+  def insertUserFromFacebookData(self, facebookData):
     cursor = self.db.cursor()
   
     # Insert a new user if one with the specified fb_uid does not already exist.
     cursor.execute("""INSERT INTO user (name, first_name, last_name, email, locale, username, gender, \
-      fb_uid, fb_verified, location_id, location_name, birthday, college, interested_in, registration_status, verification_code, paused) \
-      VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 1)""", \
-      userDataListFromFacebookData(facebookData) + ("pending", verificationCode))
+      fb_uid, fb_verified, location_id, location_name, birthday, college, interested_in, registration_status, paused) \
+      VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 0)""", \
+      userDataListFromFacebookData(facebookData) + ("pending",))
     cursor.close()
 
   # Inserts a  new user with pending registration status, verification code, and phone number.
   def insertUserFromPhoneData(self, phoneNumber, verificationCode):
     cursor = self.db.cursor()
     cursor.execute("""INSERT IGNORE INTO user (registration_status, phone_number, verification_code, paused) \
-      VALUES (%s, %s, %s, 1)""", ("pending", phoneNumber, verificationCode))
+      VALUES (%s, %s, %s, 0)""", ("pending", phoneNumber, verificationCode))
     cursor.close()
   
   # Updates Facebook data for the user with the specified user id.

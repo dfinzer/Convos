@@ -19,7 +19,7 @@ $(document).ready(function() {
   // Log home page visit.
   logVisitedPage("home");
   
-  // Set up auto-moving to the next field for phone input.
+  // Set up auto-selection of the next field for phone input.
   $(".phone-input").keyup(function() {
      if(this.value.length == $(this).attr('maxlength')) {
          $(this).next(".phone-input").focus();
@@ -35,6 +35,8 @@ $(document).ready(function() {
 function login() {
   $("#loader").show();
   $("#fb-login-box").hide();
+  
+  // Get the verification code from the url.
   code = getUrlValues()["code"];
   $.post("/api/login", {"code": code}, function(response) {    
     var data = $.parseJSON(response);
@@ -59,8 +61,8 @@ function submitPhoneNumber() {
   if (phoneNumber.length != 12) {
     error = "Whoops! Please enter 10 digits for the phone number.";
     isValid = false;
-  } else if (isNaN(phoneDigits)) {
-    error = "Phone number must be digits";
+  } else if (isNaN(phoneDigits) || phoneDigits.indexOf(".") != -1) {
+    error = "Phone number must be digits.";
     isValid = false;
   } else {
     isValid = true;
@@ -68,12 +70,19 @@ function submitPhoneNumber() {
   
   // If it's valid, go ahead and register.
   if (isValid) {
+    $("#loader").show();
+    $("#phone-number-box").hide();
     $("#phone-number-error").hide();
     $.post("/api/register_phone_number", {"phone_number": phoneNumber}, function(response) {
-        var data = $.parseJSON(response);
-        if (data.status == "registered") {
-          showGetStartedBox();
-        }
+      $("#loader").hide();
+      var data = $.parseJSON(response);
+      if (data.status == "registered") {
+        showGetStartedBox();
+      } else if (data.status == "error") {
+        showErrorBox();
+      }
+    }).error(function() {
+        showErrorBox();
     });
   // Otherwise display the error.
   } else {
@@ -85,6 +94,7 @@ function submitPhoneNumber() {
 function showErrorBox() {
   $("#error-box").show();
   $("#loader").hide();
+  $("#phone-number-box").hide();
 }
 
 function showGetStartedBox() {

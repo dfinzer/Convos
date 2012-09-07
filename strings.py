@@ -1,7 +1,7 @@
 import re
 
 # String constants.
-WELCOME_MESSAGE = "Welcome to Convos! To start a new convo text #new. Text \
+WELCOME_MESSAGE = "Welcome to Convos! Text \
 #new at any time to start a new convo (without ending your current one), or #help for more options."
 
 HELP_MESSAGE = "#new - get a new partner (without ending your current convo)\n\
