@@ -181,6 +181,11 @@ class Database():
       user_twilio_number.user_id = %s AND user_twilio_number.twilio_number_id = twilio_number.id""", (user["id"]))
     return cursor.fetchall()
     
+  def getFirstTwilioNumber(self):
+    cursor = self.db.cursor()
+    cursor.execute("""SELECT * FROM twilio_number ORDER BY id ASC""")
+    return cursor.fetchone()
+    
   def getNextAvailableTwilioNumberForUser(self, user):
     cursor = self.db.cursor()
     cursor.execute("""SELECT twilio_number.* FROM twilio_number WHERE id NOT IN \

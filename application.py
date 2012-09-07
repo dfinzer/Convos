@@ -312,7 +312,7 @@ def login():
     if existingUser:
       # If the user hasn't registered yet, send back the verification code.
       if existingUser["registration_status"] == "pending":
-        response = {"status": "pending", "verification_code": existingUser["verification_code"]}
+        response = {"status": "pending"}
       else:
         response = {"status": "registered"}
       
@@ -364,8 +364,14 @@ def login():
 @app.route("/api/register_phone_number", methods=['POST'])
 def registerPhoneNumber():
   db.openConnection()
+  phoneNumber = request.values.get("phone_number")
   if "user_id" in session:
-    db.registerUserWithPhoneNumber(session["u"])
+    twilioNumber = db.getFirstTwilioNumber()
+    db.registerUserWithPhoneNumber(session["user_id"], phoneNumber, twilioNumber)
+    response = {"status": "registered"}
+  else:
+    response = {"status": "error", "error": "No user found."}
+  return json.dumps(response)
 
 @app.route("/api/registration_status", methods=['GET'])
 def registrationStatus():

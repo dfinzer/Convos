@@ -9,7 +9,8 @@
 #phone-number-box,
 #loader,
 #get-started-box,
-#error-box
+#error-box,
+#phone-number-error
 {
   display: none;
 }
