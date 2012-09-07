@@ -232,17 +232,6 @@ def handleMessage(body, user, userTwilioNumber, resp):
     else:
       textingClient.sendNoConversationMessage(user["phone_number"], userTwilioNumber)
 
-# Attempts to register an existing user with the specified verification code.
-# Returns whether we were successful.
-def registerUser(verificationCode, phoneNumber, twilioNumber):
-  # Check that there exists an unregistered user with that verification code.
-  existingUser = db.getUserFromVerificationCode(verificationCode)
-  if existingUser:
-    db.registerUserWithPhoneNumber(existingUser["id"], phoneNumber, twilioNumber)
-    return True
-  else:
-    return False
-
 # Handles incoming text messages.
 @app.route("/api/message", methods=['POST'])
 def message():
@@ -371,6 +360,12 @@ def login():
     response = {"status": "error", "error": "Not yet logged in to Facebook."}
   db.closeConnection()
   return json.dumps(response)
+
+@app.route("/api/register_phone_number", methods=['POST'])
+def registerPhoneNumber():
+  db.openConnection()
+  if "user_id" in session:
+    db.registerUserWithPhoneNumber(session["u"])
 
 @app.route("/api/registration_status", methods=['GET'])
 def registrationStatus():

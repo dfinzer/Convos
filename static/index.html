@@ -33,15 +33,21 @@
             <br/>
           </div>
         
-          <!-- Verification code box -->
-          <div id="verification-code-box" class="well">
+          <!-- Phone number box -->
+          <div id="phone-number-box" class="well">
             <p>
-            You're almost there! Just text <b><span id="verification-code"></span></b>
-            to <b>(925) 272-0008</b> to get started. Don't worry, no one will ever see your phone number.
+            Awesome! Now enter your phone number so you can get started. Don't worry, we'll <b>never</b> share your phone number with anyone else.
             </p>
-            <a class="btn" href="javascript:switchPage('help')">Having trouble? Click here for help.</a>
+            Phone number: <br/>
+            <span class="phone-input-field">
+              ( <input type="text" class="phone-input" style="margin-top:7px; height:30px" maxlength="3"></input> )
+              <input type="text" class="phone-input" style="margin-top:7px; height:30px" maxlength="3"></input> -
+              <input type="text" class="phone-input phone-input-wide" style="margin-top:7px; height:30px" maxlength="4"></input>
+              <br/>
+              <a class="btn btn-primary btn-large" id="phone-submit">Submit</a>
+            </span>
           </div>
-
+          
           <!-- Getting started box -->
           <div id="get-started-box" class="well">
             <p>

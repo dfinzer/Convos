@@ -18,6 +18,17 @@ if (isProductionEnvironment()) {
 $(document).ready(function() {
   // Log home page visit.
   logVisitedPage("home");
+  
+  // Set up auto-moving to the next field for phone input.
+  $(".phone-input").keyup(function() {
+     if(this.value.length == $(this).attr('maxlength')) {
+         $(this).next(".phone-input").focus();
+     }
+   });
+   
+   $("#phone-submit").keyup(function() {
+     submitPhoneNumber();
+   });
 });
 
 function login() {
@@ -27,8 +38,7 @@ function login() {
   $.post("/api/login", {"code": code}, function(response) {    
     data = $.parseJSON(response);
     if (data.status == "pending") {
-      $("#verification-code").text(data.verification_code)
-      $("#verification-code-box").fadeIn("slow");
+      $("#phone-number-box").fadeIn("slow");
       
       // Poll for the user's registration status, so we can auto-update the page.
       if (!hasSetPollingInterval) {
@@ -42,6 +52,17 @@ function login() {
   }).error(function() {
     showErrorBox();
   });
+}
+
+function submitPhoneNumber() {
+  var phoneNumber = "+1" + $(".phone-input:first").val()
+    + $(".phone-input:nth-child(2)").val()
+    + $(".phone-input:last").val();
+  if (phoneNumber.length == "12") {
+    $.post("/api/phone_number", {"phone_number": phoneNumber}, function(response) {
+        
+    });
+  }
 }
 
 function showErrorBox() {
