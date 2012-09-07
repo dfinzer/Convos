@@ -107,6 +107,15 @@ CREATE TABLE `convos`.`visited_page_log` (
   PRIMARY KEY (  `id` )
 ) ENGINE = MYISAM;
 
+CREATE TABLE `convos`.`signup_log` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `ip` VARCHAR ( 100 ),
+  `user_agent` VARCHAR ( 500 ),
+  `user_id` INT,
+  `timestamp` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (  `id` )
+) ENGINE = MYISAM;
+
 CREATE TABLE `convos`.`feedback` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `ip` VARCHAR ( 100 ),

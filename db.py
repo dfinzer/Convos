@@ -330,6 +330,12 @@ class Database():
       self.requestDataTuple(data) + (getValueOrNull(data, "name"),));
     cursor.close()
     
+  def logSignup(self, data):
+    cursor = self.db.cursor()
+    cursor.execute("""INSERT INTO signup_log (ip, user_agent, user_id) VALUES (%s, %s, %s)""", \
+      self.requestDataTuple(data));
+    cursor.close()
+    
   ## Feedback/bug reports:
   def insertFeedback(self, data):
     cursor = self.db.cursor()

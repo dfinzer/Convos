@@ -296,6 +296,9 @@ def message():
 def login():
   db.openConnection()
 
+  # Get some log data.
+  logData = getRequestData()
+
   # Get the user and url code (if it exists).
   urlCode = request.values.get("code")  
   user = facebook.get_user_from_cookie(request.cookies, facebookAppId, facebookSecret)
@@ -320,6 +323,7 @@ def login():
     
     # Check if this user already exists in the database.
     existingUser = db.getUserFromFacebookUid(user["uid"])
+    
     if existingUser:
       # If the user hasn't registered yet, send back the verification code.
       if existingUser["registration_status"] == "pending":
@@ -356,6 +360,10 @@ def login():
       db.insertUserFromFacebookData(profile, verificationCode)
       response = {"status": "pending", "verification_code": verificationCode}
       existingUser = db.getUserFromFacebookUid(user["uid"])
+      
+      # Log that the user signed up.
+      logData["user_id"] = existingUser["id"]
+      db.logSignup(logData)
     
     # Record the user interests in the database.
     try:
