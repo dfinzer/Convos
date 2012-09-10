@@ -1,7 +1,3 @@
-var numberOfPolls = 0;
-var hasSetPollingInterval = false;
-var pollingIntervalId;
-
 // Google analytics.
 if (isProductionEnvironment()) {
   var _gaq = _gaq || [];

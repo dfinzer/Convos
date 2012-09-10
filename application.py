@@ -374,18 +374,7 @@ def registerPhoneNumber():
   else:
     response = {"status": "error", "error": "No user found."}
   return json.dumps(response)
-
-@app.route("/api/registration_status", methods=['GET'])
-def registrationStatus():
-  db.openConnection()
-  if "user_id" in session:
-    user = db.getUserFromId(session["user_id"])
-    response = {"status": user["registration_status"]}
-  else:
-    response = {"status": "nonexistent"}
-  db.closeConnection()
-  return json.dumps(response)
-
+  
 @app.route("/api/end_conversation", methods=['POST'])
 def endConversation():
   db.openConnection()
