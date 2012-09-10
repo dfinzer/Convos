@@ -357,7 +357,8 @@ def login():
 def registerPhoneNumber():
   db.openConnection()
   phoneNumber = request.values.get("phone_number")
-  if not phoneNumber.startswith("+1") or not phoneNumber[2:].isdigit():
+  # Hack to support test accounts.
+  if not phoneNumber.startswith("$") and (not phoneNumber.startswith("+1") or not phoneNumber[2:].isdigit()):
     app.logger.error("Invalid phone number %s" % phoneNumber);
     response = {"status": "error", "error": "Invalid phone number."}
   elif "user_id" in session:
