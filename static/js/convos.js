@@ -1,7 +1,3 @@
-var numberOfPolls = 0;
-var hasSetPollingInterval = false;
-var pollingIntervalId;
-
 // Google analytics.
 if (isProductionEnvironment()) {
   var _gaq = _gaq || [];
@@ -18,23 +14,31 @@ if (isProductionEnvironment()) {
 $(document).ready(function() {
   // Log home page visit.
   logVisitedPage("home");
+  
+  // Set up auto-selection of the next field for phone input.
+  $(".phone-input").keyup(function() {
+     if(this.value.length == $(this).attr('maxlength')) {
+         $(this).next(".phone-input").focus();
+     }
+   });
+   
+   $("#phone-submit").unbind("click");
+   $("#phone-submit").click(function() {
+     submitPhoneNumber();
+   });
 });
 
 function login() {
   $("#loader").show();
   $("#fb-login-box").hide();
+  
+  // Get the verification code from the url.
   code = getUrlValues()["code"];
   $.post("/api/login", {"code": code}, function(response) {    
-    data = $.parseJSON(response);
+    var data = $.parseJSON(response);
     if (data.status == "pending") {
-      $("#verification-code").text(data.verification_code)
-      $("#verification-code-box").fadeIn("slow");
-      
-      // Poll for the user's registration status, so we can auto-update the page.
-      if (!hasSetPollingInterval) {
-        pollingIntervalId = setInterval(pollRegistrationStatus, 2000);
-        hasSetPollingInterval = true;
-      }
+      $("#phone-number-box").fadeIn("slow");
+      $(".phone-input:first").select();
     } else if (data.status == "registered") {
       showGetStartedBox();
     }
@@ -44,33 +48,59 @@ function login() {
   });
 }
 
+function submitPhoneNumber() {
+  var phoneDigits = $(".phone-input:first").val()
+    + $(".phone-input:nth-child(2)").val()
+    + $(".phone-input:last").val()
+  var phoneNumber = "+1" + phoneDigits;
+  var isValid = false;
+  
+  // Hack for test accounts.
+  if (phoneDigits.indexOf("$") == 0) {
+    phoneNumber = phoneDigits;
+    isValid = true;
+  } else if (phoneNumber.length != 12) {
+    error = "Whoops! Please enter 10 digits for the phone number.";
+    isValid = false;
+  } else if (isNaN(phoneDigits) || phoneDigits.indexOf(".") != -1) {
+    error = "Phone number must be digits.";
+    isValid = false;
+  } else {
+    isValid = true;
+  }
+  
+  // If it's valid, go ahead and register.
+  if (isValid) {
+    $("#loader").show();
+    $("#phone-number-box").hide();
+    $("#phone-number-error").hide();
+    $.post("/api/register_phone_number", {"phone_number": phoneNumber}, function(response) {
+      $("#loader").hide();
+      var data = $.parseJSON(response);
+      if (data.status == "registered") {
+        showGetStartedBox();
+      } else if (data.status == "error") {
+        showErrorBox();
+      }
+    }).error(function() {
+        showErrorBox();
+    });
+  // Otherwise display the error.
+  } else {
+    $("#phone-number-error").text(error);
+    $("#phone-number-error").show();
+  }
+}
+
 function showErrorBox() {
   $("#error-box").show();
   $("#loader").hide();
-  $("#verification-code-box").hide();
+  $("#phone-number-box").hide();
 }
 
 function showGetStartedBox() {
-  $("#verification-code-box").hide();
+  $("#phone-number-box").hide();
   $("#get-started-box").fadeIn("slow");
-  clearInterval(pollingIntervalId)
-}
-
-function pollRegistrationStatus() {
-  numberOfPolls++;
-  if (numberOfPolls > 100) {
-    clearInterval(pollingIntervalId);
-    return;
-  }
-  $.get("/api/registration_status", {}, function(response) {
-    data = $.parseJSON(response);
-    if (data.status == "registered") {
-      showGetStartedBox();
-    }
-  }).error(function() {
-    showErrorBox();
-    clearInterval(pollingIntervalId)
-  });
 }
 
 // Switch to the page with the specified id.

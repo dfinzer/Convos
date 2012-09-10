@@ -30,28 +30,37 @@
       	<div id="loader">
           <img src="images/ajax-loader.gif"></img>
           <br/>
-          Generating verification code...
-          <br/>
-          <br/>
         </div>
-      
-        <!-- Verification code box -->
-        <div id="verification-code-box">
+        
+        <!-- Phone number box -->
+        <div id="phone-number-box">
           <p>
-          You're almost there! Just text <b><span id="verification-code"></span></b>
-          to <b>(925) 272-0008</b> to get started. Don't worry, no one will ever see your phone number.
+          Awesome! Now enter your phone number so you can get started. Don't worry, we'll <b>never</b> share your phone number with anyone else.
           </p>
+          Phone number: <br/>
+          <div class="phone-input-field">
+            ( <input type="text" class="phone-input" style="height:40px; width: 60px; display: inline;" maxlength="3"></input> )
+            <input type="text" class="phone-input" style="height:40px; width: 60px; display: inline;" maxlength="3"></input> -
+            <input type="text" class="phone-input phone-input-wide" style="height:40px; width: 80px; display: inline;" maxlength="4"></input>
+            <br/>
+            <a id="phone-submit" data-role="button" data-theme="b">Submit</a>
+          </div>
+          
+          <!-- Phone number error box -->
+          <br/>
+          <br/>
+          <div id="phone-number-error"></div>
         </div>
-
+        
         <!-- Getting started box -->
         <div id="get-started-box">
           <p>
-          You're all set up! To get started, just text <a href="sms:9252720008"><b>#new</b></a> to <b>(925) 272-0008</b> and we'll match you up!
-          <p>
-          (Text <b>#help</b> at any time to see your options)
+          You're all set up! You should receive a text message shortly. <br/>
+          At any point, you can text <b>#help</b> to <b>(925) 272-0008</b> to see your options.
           </p>
-          </p>
+          <a data-role="button" data-theme="a" href="javascript:switchPage('help')">Still haven't received a text?</a>
         </div>
+        
     	</div>
     </div>
     

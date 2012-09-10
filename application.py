@@ -232,17 +232,6 @@ def handleMessage(body, user, userTwilioNumber, resp):
     else:
       textingClient.sendNoConversationMessage(user["phone_number"], userTwilioNumber)
 
-# Attempts to register an existing user with the specified verification code.
-# Returns whether we were successful.
-def registerUser(verificationCode, phoneNumber, twilioNumber):
-  # Check that there exists an unregistered user with that verification code.
-  existingUser = db.getUserFromVerificationCode(verificationCode)
-  if existingUser:
-    db.registerUserWithPhoneNumber(existingUser["id"], phoneNumber, twilioNumber)
-    return True
-  else:
-    return False
-
 # Handles incoming text messages.
 @app.route("/api/message", methods=['POST'])
 def message():
@@ -272,12 +261,6 @@ def message():
     db.addTwilioNumberForUserIfNonexistent(user, twilioNumber)
     
     handleInstructionOrMessage(body, user, twilioNumber, phoneNumber, resp)
-  # If there's no user and the instruction is a digit, it's a verification code. So try to register the user.
-  elif body.isdigit():
-    if registerUser(body, phoneNumber, twilioNumber):
-      textingClient.sendWelcomeMessage(phoneNumber, twilioNumber, resp)
-    else:
-      textingClient.sendIncorrectVerificationCodeMessage(phoneNumber, twilioNumber, resp)
   # Otherwise the user is coming from mobile.
   elif body == "#signup" or body == "signup":
     # Create a new user, with registration status pending.
@@ -300,15 +283,14 @@ def login():
   logData = getRequestData()
 
   # Get the user and url code (if it exists).
-  urlCode = request.values.get("code")  
   user = facebook.get_user_from_cookie(request.cookies, facebookAppId, facebookSecret)
+  urlCode = request.values.get("code")  
   
-  # TODO: just check the user's session uid instead of going to Facebook every time.
   if user:
     graph = facebook.GraphAPI(user["access_token"])
     profile = graph.get_object("me")
         
-    # Update the user's education, interest, and interested_in data.
+    # Get the user's education, interest, and interested_in data.
     facebookData = graph.fql("SELECT " + ",".join(FACEBOOK_INTERESTS) + ", education, meeting_sex FROM user WHERE uid = me()")
     interestedInString = getInterestedInStringFromFacebookData(facebookData[0])
     if interestedInString:
@@ -327,7 +309,7 @@ def login():
     if existingUser:
       # If the user hasn't registered yet, send back the verification code.
       if existingUser["registration_status"] == "pending":
-        response = {"status": "pending", "verification_code": existingUser["verification_code"]}
+        response = {"status": "pending"}
       else:
         response = {"status": "registered"}
       
@@ -335,7 +317,7 @@ def login():
       db.updateUserFromFacebookData(existingUser["id"], profile)
       foundUser = True      
     # If there's a new url code, see if there's a user in the database for this code.
-    elif urlCode:
+    elif urlCode:      
       # Check for an existing unregistered user.
       existingUser = db.getUnregisteredUserFromVerificationCode(urlCode)
       
@@ -356,9 +338,8 @@ def login():
     # If we didn't find a user via the Facebook data or the urlCode, we need to make a new one.
     if not foundUser:
       # Create a new user, with registration status pending.
-      verificationCode = str(db.generateUniqueVerificationCode())
-      db.insertUserFromFacebookData(profile, verificationCode)
-      response = {"status": "pending", "verification_code": verificationCode}
+      db.insertUserFromFacebookData(profile)
+      response = {"status": "pending"}
       existingUser = db.getUserFromFacebookUid(user["uid"])
       
       # Log that the user signed up.
@@ -380,17 +361,29 @@ def login():
   db.closeConnection()
   return json.dumps(response)
 
-@app.route("/api/registration_status", methods=['GET'])
-def registrationStatus():
+@app.route("/api/register_phone_number", methods=['POST'])
+def registerPhoneNumber():
   db.openConnection()
-  if "user_id" in session:
+  phoneNumber = request.values.get("phone_number")
+  # Hack to support test accounts.
+  if not phoneNumber.startswith("$") and (not phoneNumber.startswith("+1") or not phoneNumber[2:].isdigit()):
+    app.logger.error("Invalid phone number %s" % phoneNumber);
+    response = {"status": "error", "error": "Invalid phone number."}
+  elif "user_id" in session:
+    twilioNumber = db.getFirstTwilioNumber()
+    db.registerUserWithPhoneNumber(session["user_id"], phoneNumber, twilioNumber)
     user = db.getUserFromId(session["user_id"])
-    response = {"status": user["registration_status"]}
+    
+    # Send the user a welcome message.
+    textingClient.sendWelcomeMessage(user["phone_number"], twilioNumber)
+    
+    # Match the user.
+    makeMatchAndNotify(user, twilioNumber, False)
+    response = {"status": "registered"}
   else:
-    response = {"status": "nonexistent"}
-  db.closeConnection()
+    response = {"status": "error", "error": "No user found."}
   return json.dumps(response)
-
+  
 @app.route("/api/end_conversation", methods=['POST'])
 def endConversation():
   db.openConnection()
