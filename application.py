@@ -313,9 +313,7 @@ def login():
       db.updateUserFromFacebookData(existingUser["id"], profile)
       foundUser = True      
     # If there's a new url code, see if there's a user in the database for this code.
-    elif urlCode:
-      print "here"
-      
+    elif urlCode:      
       # Check for an existing unregistered user.
       existingUser = db.getUnregisteredUserFromVerificationCode(urlCode)
       
