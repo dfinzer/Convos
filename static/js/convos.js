@@ -50,7 +50,7 @@ function login() {
 
 function submitPhoneNumber() {
   var phoneDigits = $(".phone-input:first").val()
-    + $(".phone-input:nth-child(2)").val()
+    + $(".phone-input-second").val()
     + $(".phone-input:last").val()
   var phoneNumber = "+1" + phoneDigits;
   var isValid = false;
