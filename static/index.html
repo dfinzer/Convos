@@ -17,119 +17,130 @@
     </script>
     <div id="fb-root"></div>
     <br/>
-    <div class="container">
-      <div class="hero-unit">
-        <div id="home" class="page current-page">
-          <h1>Welcome to Convos</h1>
+    <img class="bubble-img" src="images/bubble.jpg"/>
+    <div class="container-fluid">
+      <div class="row-fluid">
+        <div class="span5">
+          <img class="screenshot" src="images/screen.jpg"/>
+        </div>
+        <div class="span6"> 
           <br/>
-          <p>
-            Convos is a text roulette app that pairs you up with other Brown students based on common interests.
-            It's all through texting, so you don't even need to install an app! And we'll never share your phone number or post on your wall!
-          </p>
-        
-          <!-- Loading box -->
-          <div id="loader">
-            <img src="images/ajax-loader.gif"></img>
+          <div id="home" class="page current-page">
+            <h1>Convos</h1>
             <br/>
             <br/>
-          </div>
-        
-          <!-- Phone number box -->
-          <div id="phone-number-box" class="well">
             <p>
-            Awesome! Now enter your phone number so you can get started. Don't worry, we'll <b>never</b> share your phone number with anyone else.
+              Convos is a text roulette app that pairs you up with other Brown students based on common interests.
+              It's all through texting, so you don't even need to install an app! And we'll never share your phone number or post on your wall!
             </p>
-            Phone number: <br/>
-            <span class="phone-input-field">
-              ( <input type="text" class="phone-input" style="margin-top:7px; height:30px" maxlength="3"></input> )
-              <input type="text" class="phone-input phone-input-second" style="margin-top:7px; height:30px" maxlength="3"></input> -
-              <input type="text" class="phone-input phone-input-wide" style="margin-top:7px; height:30px" maxlength="4"></input>
+        
+            <!-- Loading box -->
+            <div id="loader">
+              <img src="images/ajax-loader.gif"></img>
               <br/>
-              <a class="btn btn-primary btn-large" id="phone-submit">Submit</a>
-            </span>
+              <br/>
+            </div>
+        
+            <!-- Phone number box -->
+            <div id="phone-number-box" class="well">
+              <p>
+              Awesome! Now enter your phone number so you can get started. Don't worry, we'll <b>never</b> share your phone number with anyone else.
+              </p>
+              Phone number: <br/>
+              <span class="phone-input-field">
+                ( <input type="text" class="phone-input" style="margin-top:7px; height:30px" maxlength="3"></input> )
+                <input type="text" class="phone-input phone-input-second" style="margin-top:7px; height:30px" maxlength="3"></input> -
+                <input type="text" class="phone-input phone-input-wide" style="margin-top:7px; height:30px" maxlength="4"></input>
+                <br/>
+                <a class="btn btn-primary btn-large" id="phone-submit">Submit</a>
+              </span>
             
-            <!-- Phone number error box -->
-            <br/>
-            <br/>
-            <div id="phone-number-error" class="well"></div>
-          </div>
+              <!-- Phone number error box -->
+              <br/>
+              <br/>
+              <div id="phone-number-error" class="well"></div>
+            </div>
           
-          <!-- Getting started box -->
-          <div id="get-started-box" class="well">
-            <p>
-            You're all set up! You should receive a text message shortly. <br/>
-            At any point, you can text <b>#help</b> to <b>(925) 272-0008</b> to see your options.
-            <p>
-            <a class="btn" href="javascript:switchPage('help')">Still haven't received a text? Click here.</a>
-          </div>
+            <!-- Getting started box -->
+            <div id="get-started-box" class="well">
+              <p>
+              You're all set up! You should receive a text message shortly. <br/>
+              At any point, you can text <b>#help</b> to <b>(925) 272-0008</b> to see your options.
+              <p>
+              <a class="btn" href="javascript:switchPage('help')">Still haven't received a text? Click here.</a>
+            </div>
         
-          <!-- Facebook login button -->
-          <div id="fb-login-box">
-            <a id="fb-login" class="btn btn-primary btn-large">
-            Login With Facebook
-            </a>
-            <br/><br/>
-          </div>
+            <!-- Facebook login button -->
+            <div id="fb-login-box">
+              <a id="fb-login" class="btn btn-primary btn-large">
+              Login With Facebook
+              </a>
+              <br/><br/>
+            </div>
           
-          <!-- Error box -->
-          <div id="error-box" class="well">
-            An unexpected error occurred. Please refresh your browser and try again. Sorry!
+            <!-- Error box -->
+            <div id="error-box" class="well">
+              An unexpected error occurred. Please refresh your browser and try again. Sorry!
+            </div>
           </div>
-        </div>
                 
-        <!-- Feedback box -->
-        <div id="feedback" class="page">
-          <h1>Feedback</h1>
-          <h2>We'd love to get your feedback!</h2>
-          Feedback:<br/>
-          <textarea class="form_text field span6" rows="4"></textarea>
-          <br/>
-          <button onclick="submitForm('/api/feedback')">Submit</button>
-          <br/>
-          <br/>
-        </div>
-        
-        <!-- Help box -->
-        <div id="help" class="page">
-          <h1>Help</h1>
-          <p>
-            Text <b>#help</b> at any time to see your options.
-          </p>
-          <p>
-            Having trouble getting Convos to work? Contact us at <a href="mailto:info@getconvos.com">info@getconvos.com</a>.
+          <!-- Feedback box -->
+          <div id="feedback" class="page">
+            <h1>Feedback</h1>
+            <h2>We'd love to get your feedback!</h2>
+            Feedback:<br/>
+            <textarea class="form_text field span6" rows="4"></textarea>
             <br/>
-            <a href="javascript:switchPage('home')">Back to main page...</a>
-          </p>
-        </div>
+            <button onclick="submitForm('/api/feedback')">Submit</button>
+            <br/>
+            <br/>
+          </div>
         
-        <!-- Bug report box -->
-        <div id="bug", class="page">
-          <h1>File a Bug</h1>
-          <br/>
-          What happened?<br/>
-          <textarea class="form_text field span6" rows="4"></textarea>
-          <br/>
-          <button onclick="submitForm('/api/bug_report')">Submit</button>
-          <br/>
-          <br/>
-        </div>
+          <!-- Help box -->
+          <div id="help" class="page">
+            <h1>Help</h1>
+            <p>
+              Text <b>#help</b> at any time to see your options.
+            </p>
+            <p>
+              Having trouble getting Convos to work? Contact us at <a href="mailto:info@getconvos.com">info@getconvos.com</a>.
+              <br/>
+              <a href="javascript:switchPage('home')">Back to main page...</a>
+            </p>
+          </div>
         
-        <!-- Contact us box -->
-        <div id="contact", class="page">
-          <h1>Contact</h1>
-          <p>
-            Feel free to contact us at <a href="mailto:info@getconvos.com">info@getconvos.com</a>.
-          </p>
-        </div>
-        <div>
-          <a href="javascript:switchPage('home')">Home</a> |
-          <a href="javascript:switchPage('feedback')">Feedback</a> |
-          <a href="javascript:switchPage('help')">Help</a> |
-          <a href="javascript:switchPage('bug')">File a Bug</a> |
-          <a href="javascript:switchPage('contact')">Contact</a>
+          <!-- Bug report box -->
+          <div id="bug" class="page">
+            <h1>File a Bug</h1>
+            <br/>
+            What happened?<br/>
+            <textarea class="form_text field span6" rows="4"></textarea>
+            <br/>
+            <button onclick="submitForm('/api/bug_report')">Submit</button>
+            <br/>
+            <br/>
+          </div>
+        
+          <!-- Contact us box -->
+          <div id="contact" class="page">
+            <h1>Contact</h1>
+            <p>
+              Feel free to contact us at <a href="mailto:info@getconvos.com">info@getconvos.com</a>.
+            </p>
+          </div>
         </div>
       </div>
     </div>
+
+    <footer class="footer" style="background-color:#c2c2c2;">
+            <div class="row">
+              <a href="javascript:switchPage('home')">Home</a> |
+              <a href="javascript:switchPage('feedback')">Feedback</a> |
+              <a href="javascript:switchPage('help')">Help</a> |
+              <a href="javascript:switchPage('bug')">File a Bug</a> |
+              <a href="javascript:switchPage('contact')">Contact</a>
+            </div>
+    </footer>
     <!-- Javascript -->
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
     <script src="js/util.js"></script>

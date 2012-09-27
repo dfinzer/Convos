@@ -1,3 +1,18 @@
+h1 {
+  margin-bottom: 0;
+  font-size: 60px;
+  line-height: 1;
+  letter-spacing: -1px;
+  color: inherit;
+}
+
+p {
+  font-size: 18px;
+  font-weight: 200;
+  line-height: 30px;
+  color: inherit;
+}
+
 .page {
   display: none;
 }
@@ -28,6 +43,11 @@
   margin-bottom: 5px;
 }
 
+.screenshot
+{
+  float: left;
+}
+
 .phone-input-wide
 {
   width: 50px;
@@ -37,4 +57,25 @@
 {
   font-size: 30px;
   color: gray;
+}
+
+.footer 
+{
+  text-align: center;
+  position: relative;
+	height: 150px;
+	clear: both;
+  padding-top:20px;
+}
+
+.bubble-img
+{
+  position: absolute;
+  right: 40px;
+  width: 200px;
+  z-index: -1;
+}
+
+.span5 {
+  padding: 10px;
 }
