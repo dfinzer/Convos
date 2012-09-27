@@ -1,6 +1,7 @@
 import argparse
 import facebook
 import json
+import os
 import random
 import twilio.twiml
 
@@ -8,19 +9,16 @@ from constants import *
 from db import Database
 from flask import Flask, request, session
 from strings import *
+from utils import *
 from twilioClient import TwilioClient, TwilioTestClient
 
 app = Flask(__name__)
 app.secret_key = 'abcdefgh123456'
 
-# Parse command line options
-parser = argparse.ArgumentParser(description='Command line options for convos server.')
-parser.add_argument('--debug', action="store_true", default=False, dest="debug")
-args = parser.parse_args()
 db = Database()
 
 # Development configuration.
-if args.debug:
+if "DEBUG_CONVOS" in os.environ:
   textingClient = TwilioTestClient(db)
   facebookAppId = PROD_FACEBOOK_ID
   facebookSecret = PROD_FACEBOOK_SECRET
@@ -45,15 +43,6 @@ else:
     ADMINS, 'Convos Failed', credentials=('AKIAJVZYBPD2LLMWMDAA', 'Alwl4cvm2242mRq5r9h/2PgAfZ8FHJLTeAqTBO+R8CZP'))
   mail_handler.setLevel(logging.WARNING)
   app.logger.addHandler(mail_handler)
-
-# Gets the other user id from a conversation.
-def getOtherUserId(conversation, user):
-  return conversation["user_two_id"] if conversation["user_one_id"] == user["id"]  \
-    else conversation["user_one_id"]
-
-def getOtherUserTwilioNumberId(conversation, user):
-  return conversation["user_two_twilio_number_id"] if conversation["user_one_id"] == user["id"] \
-    else conversation["user_one_twilio_number_id"]
 
 # Generates an array of interests (strings) from a more complex array of Facebook data.
 def interestArrayFromFacebookLikeData(facebookLikeData):
@@ -111,9 +100,9 @@ def endConversationForUserAndGetNewMatchForPartner(user, userTwilioNumber):
     db.endConversation(conversation["id"])
     
     # Get a new match for the rejected user.
-    oldMatchedUserId = getOtherUserId(conversation, user)
+    oldMatchedUserId = getOtherUserId(conversation, user["id"])
     oldMatchedUser = db.getUserFromId(oldMatchedUserId)
-    oldMatchedUserTwilioNumberId = getOtherUserTwilioNumberId(conversation, user)
+    oldMatchedUserTwilioNumberId = getOtherUserTwilioNumberId(conversation, user["id"])
     oldMatchedUserTwilioNumber = db.getTwilioNumberFromId(oldMatchedUserTwilioNumberId)
     makeMatchAndNotify(oldMatchedUser, oldMatchedUserTwilioNumber, True)
 
@@ -215,8 +204,8 @@ def handleMessage(body, user, userTwilioNumber, resp):
   conversation = db.getCurrentConversationForUser(user["id"], userTwilioNumber)
   if conversation:
     # Get the matched user.
-    matchedUserId = getOtherUserId(conversation, user)
-    matchedUserTwilioNumberId = getOtherUserTwilioNumberId(conversation, user)
+    matchedUserId = getOtherUserId(conversation, user["id"])
+    matchedUserTwilioNumberId = getOtherUserTwilioNumberId(conversation, user["id"])
     matchedUser = db.getUserFromId(matchedUserId)
     matchedUserTwilioNumber = db.getTwilioNumberFromId(matchedUserTwilioNumberId)
     matchedPhoneNumber = matchedUser["phone_number"]

@@ -1,1 +1,1 @@
-python application.py --debug
+DEBUG_CONVOS=true python application.py
