@@ -105,6 +105,9 @@ def abbreviatedCollegeString(college):
 
 # Generates a "new match" string given the available data.
 def newMatchString(gender, college, interests, commonInterests, newMatchMessage=NEW_MATCH):
+  # Capitalize gender.
+  gender = "Male" if gender == "male" else "Female"
+  
   newPartnerString = newMatchMessage
   if gender:
     newPartnerString += gender
