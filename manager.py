@@ -20,7 +20,7 @@ def remind(texts=False, stagnancy_threshold=24):
     twentyFourHours = timedelta(hours=int(stagnancy_threshold))
 
     # Check that a message hasn't been sent in the last twenty four hours.
-    if datetime.now() - message["timestamp"]  > twentyFourHours:
+    if message["timestamp"] and datetime.now() - message["timestamp"]  > twentyFourHours:
       userOne = db.getUserFromId(conversation["user_one_id"])
       userTwo = db.getUserFromId(conversation["user_two_id"])
       print "Stagnant conversation for users %s, %s %s" % (userOne["name"], userTwo["name"], \
