@@ -60,6 +60,14 @@ CREATE TABLE  `convos`.`message` (
   `conversation_id` INT NOT NULL,
   `from_user_id` INT NOT NULL,
   `body` VARCHAR ( 500 ) NOT NULL,
+  `timestamp` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (  `id` )
+) ENGINE = MYISAM;
+
+CREATE TABLE  `convos`.`reminder` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `conversation_id` INT NOT NULL,
+  `timestamp` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (  `id` )
 ) ENGINE = MYISAM;
 

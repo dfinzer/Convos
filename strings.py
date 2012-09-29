@@ -36,6 +36,11 @@ new partner."
 
 SIGNUP_URL = "Welcome to Convos. To get started, click the following url: http://getconvos.com?code=%s"
 
+REMINDER_LAST_TEXTER = "It's been a while since you've received a message from your texting partner. To end the conversation, text #end. To start a \
+new conversation (without ending this one), text #new."
+REMINDER_NOT_LAST_TEXTER = "It's been a while since you've responded to this conversation. To end the conversation text #end, or to start a new \
+conversation (without ending this one), text #new."
+
 # Other constants.
 SMS_MAX_LENGTH = 160
 

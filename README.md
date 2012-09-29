@@ -17,3 +17,8 @@ mysql -u$1 -p$2 < dump-fixed.sql
 
 Extra notes:s
 convos12345 is a password for something.
+
+
+Migration for reminders:
+easy_install Flask-Script
+Look into if we need to set environment variable (in theory we shouldn't)

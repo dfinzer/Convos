@@ -103,6 +103,12 @@ class TwilioClient:
     signupMessage = signupUrlString(verificationCode)
     self.sendMessage(toNumber, twilioNumber, signupMessage, existingResponse)
     
+  def sendReminderLastTexter(self, toNumber, twilioNumber, existingResponse=None):
+    self.sendMessage(toNumber, twilioNumber, REMINDER_LAST_TEXTER, existingResponse)
+  
+  def sendReminderNotLastTexter(self, toNumber, twilioNumber, existingResponse=None):
+    self.sendMessage(toNumber, twilioNumber, REMINDER_NOT_LAST_TEXTER, existingResponse)
+    
 class TwilioTestClient(TwilioClient):
   def sendMessage(self, toNumber, twilioNumber, body, existingResponse=None):
     # Just logs the message. Doesn't send via twilio.
