@@ -291,6 +291,12 @@ class Database():
       user_two_id, user_two_twilio_number_id, in_progress) VALUES (%s, %s, %s, %s, 1)""", \
       (userOneId, userOneTwilioNumber["id"], userTwoId, userTwoTwilioNumber["id"]))
     cursor.close()
+    
+  # Get all in progress conversations in the db.
+  def getInProgressConversations(self):
+    cursor = self.db.cursor()
+    cursor.execute("""SELECT * FROM conversation WHERE in_progress = 1""")
+    return cursor.fetchall()
 
   # Gets the current in-progress conversation for the user on the specified twilio number.
   def getCurrentConversationForUser(self, userId, userTwilioNumber):
@@ -311,6 +317,22 @@ class Database():
     cursor = self.db.cursor()
     cursor.execute("""INSERT INTO message (conversation_id, from_user_id, body) VALUES (%s, %s, %s)""", \
       (conversationId, fromUserId, body))
+    cursor.close()
+    
+  def getLastMessageForConversation(self, conversationId):
+    cursor = self.db.cursor()
+    cursor.execute("""SELECT * FROM message WHERE conversation_id = %s ORDER BY id DESC""", (conversationId))
+    return cursor.fetchone()
+    
+  ## Reminders.
+  def getReminderForConversation(self, conversationId):
+    cursor = self.db.cursor()
+    cursor.execute("""SELECT * FROM reminder WHERE conversation_id = %s""", (conversationId))
+    return cursor.fetchone()
+  
+  def insertReminderForConversation(self, conversationId):
+    cursor = self.db.cursor()
+    cursor.execute("""INSERT INTO reminder (conversation_id) VALUES (%s)""", (conversationId))
     cursor.close()
   
   ## Logging:
