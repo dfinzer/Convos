@@ -52,6 +52,7 @@ CREATE TABLE `convos`.`conversation` (
   `user_two_id` INT NOT NULL,
   `user_two_twilio_number_id` INT NOT NULL,
   `in_progress` BOOLEAN,
+  `start_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (  `id` )
 ) ENGINE = MYISAM;
 
