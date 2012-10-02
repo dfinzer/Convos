@@ -441,22 +441,37 @@ def bugReport():
   db.closeConnection()
   return genericResponse()
 
+def isAdmin():
+  if "user_id" in session:
+    user = db.getUserFromId(session["user_id"])
+    if user["name"] == "Devin Finzer":
+      return True
+  else:
+    return False
+  return False
+
 ## Admin urls.
 # Gets all the SMS sent for a particular phone number and twilio number combo.
 @app.route("/api/admin/get_messages", methods=["GET"])
 def getMessages():
   db.openConnection()
-  if "user_id" in session:
-    user = db.getUserFromId(session["user_id"])
-    if user["name"] != "Devin Finzer":
-      return "Unauthorized."
-  else:
-    return "Need to log in."
+  if not isAdmin():
+    return "Unauthorized."
   phoneNumber = request.values.get("phone_number")
   twilioNumber = db.getTwilioNumberFromNumber(request.values.get("twilio_number"))
   messages = db.getMessagesForPhoneNumberAndTwilioNumber(phoneNumber, twilioNumber)
   db.closeConnection()
   return json.dumps(messages)
+
+@app.route("/api/admin/get_conversations", methods=["GET"])
+def getConversations():
+  db.openConnection()
+  if not isAdmin():
+    return "Unauthorized."
+  userId = request.values.get("user_id")
+  conversations = db.getConversationsForUser(userId)
+  db.closeConnection()
+  return json.dumps(conversations)
 
 if __name__ == "__main__":
   app.run(debug=True, port=10080)

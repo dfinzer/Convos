@@ -383,3 +383,10 @@ class Database():
       ORDER BY ID DESC""", \
       (phoneNumber, twilioNumber["id"]))
     return cursor.fetchall()
+    
+  def getConversationsForUser(self, userId):
+    cursor = self.db.cursor()
+    cursor.execute("""SELECT user_one.name, user_two.name FROM conversation INNER JOIN user user_one ON user_one.id = user_one_id \
+      INNER JOIN user user_two ON user_two.id = user_two_id \
+      WHERE user_one_id = %s OR user_two_id = %s ORDER BY in_progress""", (userId, userId))
+    return cursor.fetchall()

@@ -33,13 +33,26 @@
             Body: <input type="text" id="body" value=""></input><br/s>
             <button id="get_messages">Get messages</button>
             <button id="send_message">Send message</button>
+            <br/>
+            <br/>
+            User Id: <input type="text" id="user_id" value=""></input><br/s>
+            <button id="get_conversations">Get conversations</button>
           </div>
         
           <!-- Displays the to and from messages for the desired number -->
+          Messages:
           <div id="messages" class="well"></div>
           <div class="message template">
             <span class="to">Me:</span>
             <span class="body">Hey there.</span>
+          </div>
+          
+          <!-- Displays who the user is in conversation with -->
+          Conversations:
+          <div id="conversations" class="well"></div>
+          <div class="conversation template">
+            <span class="user_one"></span>, 
+            <span class="user_two"></span>
           </div>
         </div>
       </div>

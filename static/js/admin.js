@@ -11,6 +11,10 @@ $(document).ready(function() {
     var body = $("#body").val();
     sendMessage(phoneNumber, twilioNumber, body);
   });
+  $("#get_conversations").click(function() {
+    var userId = $("#user_id").val()
+    getConversations(userId);
+  });
 });
 
 // Fetches messages for the specified phone number and twilio number combo.
@@ -24,6 +28,20 @@ function getMessages(phoneNumber, twilioNumber) {
         messageDiv.find(".to").text(message.outbound == 0 ? "Me: " : "Them: ");
         messageDiv.find(".body").text(message.body);
         $("#messages").append(messageDiv);
+      }
+  });
+}
+
+function getConversations(userId) {
+  $("#conversations").html("");
+  $.getJSON("/api/admin/get_conversations", {"user_id": userId}, 
+    function(conversations) {
+      for (i in conversations) {
+        var conversation = conversations[i];
+        conversationDiv = makeElement("conversation");
+        conversationDiv.find(".user_one").text(conversation["name"]);
+        conversationDiv.find(".user_two").text(conversation["user_two.name"]);
+        $("#conversations").append(conversationDiv);
       }
   });
 }
