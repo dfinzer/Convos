@@ -31,6 +31,7 @@ $(document).ready(function() {
 function login() {
   $("#loader").show();
   $("#fb-login-box").hide();
+  $("#description").hide();
   
   // Get the verification code from the url.
   code = getUrlValues()["code"];
