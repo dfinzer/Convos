@@ -41,6 +41,7 @@ function getConversations(userId) {
         conversationDiv = makeElement("conversation");
         conversationDiv.find(".user_one").text(conversation["name"]);
         conversationDiv.find(".user_two").text(conversation["user_two.name"]);
+        conversationDiv.find(".in_progress").text(conversation["in_progress"]);
         $("#conversations").append(conversationDiv);
       }
   });
