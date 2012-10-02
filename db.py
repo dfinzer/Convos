@@ -300,6 +300,11 @@ class Database():
       (userOneId, userOneTwilioNumber["id"], userTwoId, userTwoTwilioNumber["id"]))
     cursor.close()
     
+  def getConversation(self, conversationId):
+    cursor = self.db.cursor()
+    cursor.execute("""SELECT * FROM conversation WHERE id = %s AND in_progress = 1""", (conversationId))
+    return cursor.fetchone()
+  
   # Get all in progress conversations in the db.
   def getInProgressConversations(self):
     cursor = self.db.cursor()
