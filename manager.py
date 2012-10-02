@@ -40,35 +40,50 @@ def remind(texts=False, stagnancy_threshold=24):
       
       # If no reminder has been sent yet, send one.
       if not reminder:
-        # Get the user id's for the last person who texted and the user who hasn't texted.
-        lastTexterUserId = message["from_user_id"]
+        # If a message has been sent in the convo, we differentiate our messages sent based on the
+        # last texter.
+        if message:
+          # Get the user id's for the last person who texted and the user who hasn't texted.
+          lastTexterUserId = message["from_user_id"]
       
-        # Get the twilio numbers for the users.
-        if lastTexterUserId == conversation["user_one_id"]:
-          lastTexterTwilioNumberId = conversation["user_one_twilio_number_id"]
-          notLastTexterTwilioNumberId = conversation["user_two_twilio_number_id"]
+          # Get the twilio numbers for the users.
+          if lastTexterUserId == conversation["user_one_id"]:
+            lastTexterTwilioNumberId = conversation["user_one_twilio_number_id"]
+            notLastTexterTwilioNumberId = conversation["user_two_twilio_number_id"]
+          else:
+            lastTexterTwilioNumberId = conversation["user_two_twilio_number_id"]
+            notLastTexterTwilioNumberId = conversation["user_one_twilio_number_id"]
+      
+          # Fetch the twilio numbers from the db.
+          lastTexterTwilioNumber = db.getTwilioNumberFromId(lastTexterTwilioNumberId)
+          notLastTexterTwilioNumber = db.getTwilioNumberFromId(notLastTexterTwilioNumberId)
+      
+          # Get user data.
+          lastTexterUser = db.getUserFromId(lastTexterUserId)
+          notLastTexterUserId = getOtherUserId(conversation, lastTexterUser["id"])
+          notLastTexterUser = db.getUserFromId(notLastTexterUserId)
+
+          # Send the messages.
+          textingClient.sendReminderLastTexter(lastTexterUser["phone_number"], \
+            lastTexterTwilioNumber)
+          textingClient.sendReminderNotLastTexter(notLastTexterUser["phone_number"], \
+            notLastTexterTwilioNumber)
+
+        # Otherwise, we send the default reminder to both users.
         else:
-          lastTexterTwilioNumberId = conversation["user_two_twilio_number_id"]
-          notLastTexterTwilioNumberId = conversation["user_one_twilio_number_id"]
-      
-        # Fetch the twilio numbers from the db.
-        lastTexterTwilioNumber = db.getTwilioNumberFromId(lastTexterTwilioNumberId)
-        notLastTexterTwilioNumber = db.getTwilioNumberFromId(notLastTexterTwilioNumberId)
-      
-        # Get user data.
-        lastTexterUser = db.getUserFromId(lastTexterUserId)
-        notLastTexterUserId = getOtherUserId(conversation, lastTexterUser["id"])
-        notLastTexterUser = db.getUserFromId(notLastTexterUserId)
-
-        # Send the messages.
-        textingClient.sendReminderLastTexter(lastTexterUser["phone_number"], \
-          lastTexterTwilioNumber)
-        textingClient.sendReminderNotLastTexter(notLastTexterUser["phone_number"], \
-          notLastTexterTwilioNumber)
-
+          userOne = db.getUserFromId(conversation["user_one_id"])
+          userTwo = db.getUserFromId(conversation["user_two_id"])
+          userOneTwilioNumber = db.getTwilioNumberFromId(conversation["user_one_twilio_number_id"])
+          userTwoTwilioNumber = db.getTwilioNumberFromId(conversation["user_two_twilio_number_id"])
+          
+          # Send the same message to both users.
+          textingClient.sendReminderNotLastTexter(userOne["phone_number"], \
+            userOneTwilioNumber)
+          textingClient.sendReminderNotLastTexter(userTwo["phone_number"], \
+            userTwoTwilioNumber)
+            
         # Insert the reminder into the database.
         db.insertReminderForConversation(conversation["id"])
-  
   db.closeConnection()
 
 if __name__ == "__main__":
