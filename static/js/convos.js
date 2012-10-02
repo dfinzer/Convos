@@ -28,6 +28,10 @@ $(document).ready(function() {
    });
 });
 
+function showMoreHints() {
+  $("#more_hints").show("slow");
+}
+
 function login() {
   $("#loader").show();
   $("#fb-login-box").hide();
