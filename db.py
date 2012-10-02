@@ -234,6 +234,9 @@ class Database():
     cursor = self.db.cursor()
     userId = user["id"]
     
+    cursor.execute("""SELECT * FROM conversation WHERE user_one_id = %s OR user_two_id = %s""", (userId, userId))
+    pastConvo = cursor.fetchone()      
+    
     # Get the users interests, and use that to decide who to search for.
     interestedIn = user["interested_in"]
     matchGenders = ["male", "female"]
@@ -243,6 +246,11 @@ class Database():
       matchGenders = ["male"]
     elif interestedIn == "F":
       matchGenders = ["female"]
+    # If this is the user's first convo, give him/her someone from the opposite gender.
+    elif not pastConvo:
+      print "here"
+      matchGenders = ["female"] if user["gender"] == "male" else ["male"]
+      
     matchGenderFormats = ["%s"] * len(matchGenders)
     matchGenderFormatString = "(" + ",".join(matchGenderFormats) + ")"
     
