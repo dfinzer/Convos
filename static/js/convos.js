@@ -58,21 +58,7 @@ function submitPhoneNumber() {
     + $(".phone-input-second").val()
     + $(".phone-input:last").val()
   var phoneNumber = "+1" + phoneDigits;
-  var isValid = false;
-  
-  // Hack for test accounts.
-  if (phoneDigits.indexOf("$") == 0) {
-    phoneNumber = phoneDigits;
-    isValid = true;
-  } else if (phoneNumber.length != 12) {
-    error = "Whoops! Please enter 10 digits for the phone number.";
-    isValid = false;
-  } else if (isNaN(phoneDigits) || phoneDigits.indexOf(".") != -1) {
-    error = "Phone number must be digits.";
-    isValid = false;
-  } else {
-    isValid = true;
-  }
+  var isValid = true;
   
   // If it's valid, go ahead and register.
   if (isValid) {
