@@ -356,7 +356,9 @@ def registerPhoneNumber():
   phoneNumber = request.values.get("phone_number")
   # Hack to support test accounts.
   if not phoneNumber.startswith("$") and (not phoneNumber.startswith("+1") or not phoneNumber[2:].isdigit()):
-    app.logger.error("Invalid phone number %s" % phoneNumber);
+    user = db.getUserFromId(session["user_id"])
+    requestData = getRequestData()
+    app.logger.error("Invalid phone number %s for user id %s. Request data: %s" % (phoneNumber, user["id"], requestData));
     response = {"status": "error", "error": "Invalid phone number."}
   elif "user_id" in session:
     twilioNumber = db.getFirstTwilioNumber()
