@@ -49,12 +49,6 @@ function getConversations(userId) {
 
 // Sends a message, as long as its a legal number.
 function sendMessage(phoneNumber, twilioNumber, body) {
-  // Make sure the phone number starts with the secret character.
-  if (phoneNumber.indexOf("$") != 0) {
-    alert("Illegal! You can only send messages from admin numbers.");
-    return;
-  }
-  
   // Send the message.
   $.post("/api/message", {"From": phoneNumber, "To": twilioNumber, "Body": body}, function(response) {
     getMessages(phoneNumber, twilioNumber);
